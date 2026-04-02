@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>XSafe Shortlink</title>
+<title>XSafe GLOBAL FIX</title>
 
 <style>
 body{margin:0;font-family:Arial;background:#0b1220;color:#fff}
@@ -14,14 +14,8 @@ input,textarea{width:100%}
 button{background:#22c55e;color:#fff;cursor:pointer}
 .item{background:#020617;padding:10px;border-radius:10px;margin-top:10px;word-break:break-all}
 img{max-width:100%;border-radius:10px;margin:15px 0}
-
-.center-box{display:flex;flex-direction:column;align-items:center;justify-content:center}
-
 .loader{margin:20px auto;width:60px;height:60px;border-radius:50%;border:5px solid #1f2937;border-top:5px solid #22c55e;animation:spin 1s linear infinite}
 @keyframes spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
-
-.pulse{animation:pulse 1.5s infinite}
-@keyframes pulse{0%{opacity:.4}50%{opacity:1}100%{opacity:.4}}
 </style>
 </head>
 
@@ -34,14 +28,16 @@ img{max-width:100%;border-radius:10px;margin:15px 0}
 const PIN = "270491";
 const DOMAIN = "https://www.xsafe.biz.id";
 
-// ================= STORAGE SAFE =================
-function saveData(code,data){
-  localStorage.setItem(code, JSON.stringify(data));
+// ================= SAFE BASE64 =================
+function encodeURL(url){
+  return btoa(unescape(encodeURIComponent(url)));
 }
-function getData(code){
-  let data = localStorage.getItem(code);
-  if(!data) return null;
-  return JSON.parse(data);
+function decodeURL(str){
+  try{
+    return decodeURIComponent(escape(atob(str)));
+  }catch{
+    return null;
+  }
 }
 
 // ================= PIN =================
@@ -70,7 +66,8 @@ function isLogged(){
 
 // ================= UTIL =================
 function normalize(url){
-  return /^https?:\/\//i.test(url)?url:"https://"+url;
+  if(!/^https?:\/\//i.test(url)) return "https://"+url;
+  return url;
 }
 
 function uniqueCode(){
@@ -79,17 +76,16 @@ function uniqueCode(){
 
 function copyText(text){
   navigator.clipboard.writeText(text);
-  alert('Copied');
 }
 
-// ================= ARTICLES =================
+// ================= ARTICLE =================
 function getArticle(){
-  const img = "https://picsum.photos/800/400?random="+Math.random();
+  const img = "https://picsum.photos/800/400?"+Date.now();
   return `
-  <h2>Best Video Downloader & Player</h2>
+  <h2>Video Downloader & Player Guide</h2>
   <img src="${img}">
   <p>
-  Video downloading and playback software has become essential for users who want flexibility in consuming digital content. These tools allow users to download videos from various platforms and store them locally for offline viewing. Modern applications support multiple formats such as MP4, AVI, and MKV, along with HD and 4K quality options. In addition to downloading, video players now come equipped with powerful features like subtitle synchronization, playback speed control, and hardware acceleration. These features enhance the viewing experience and ensure smooth performance even on lower-end devices.
+  Modern video downloader and player tools allow users to save and watch content offline efficiently. These tools support multiple formats such as MP4, MKV, and AVI while offering high-definition playback. Advanced features like subtitle synchronization, playback speed control, and hardware acceleration make the experience smoother across all devices including mobile phones and desktops.
   </p>`;
 }
 
@@ -99,16 +95,10 @@ function generate(){
   if(!url) return alert('Enter URL');
 
   url = normalize(url);
+  const code = uniqueCode();
+  const encoded = encodeURL(url);
 
-  let code = uniqueCode();
-  while(localStorage.getItem(code)) code = uniqueCode();
-
-  // IMPORTANT FIX: embed target in URL (mobile safe)
-  const encoded = btoa(url);
-
-  const short = DOMAIN + location.pathname + '#' + code + "|" + encoded;
-
-  saveData(code,{url,clicks:0});
+  const short = DOMAIN + '/#' + code + '|' + encoded;
 
   document.getElementById('result').innerHTML = `
   <div class='item'>${short}<br>
@@ -122,12 +112,10 @@ function bulk(){
 
   list.forEach(u=>{
     let url = normalize(u);
-    let code = uniqueCode();
+    const code = uniqueCode();
+    const encoded = encodeURL(url);
 
-    const encoded = btoa(url);
-    const short = DOMAIN + location.pathname + '#' + code + "|" + encoded;
-
-    saveData(code,{url,clicks:0});
+    const short = DOMAIN + '/#' + code + '|' + encoded;
 
     html += `<div class='item'>${short}<br><button onclick="copyText('${short}')">Copy</button></div>`;
   });
@@ -159,19 +147,17 @@ function dashboard(){
 
 // ================= REDIRECT =================
 function redirectPage(target){
-  const delay = Math.floor(Math.random()*3)+5; // faster
+  const delay = Math.floor(Math.random()*3)+5;
 
   document.getElementById('app').innerHTML = `
   <div class='container'>
     <div class='card'>
       ${getArticle()}
-      <div class='center-box'>
-        <div class='loader'></div>
-        <p id='count' class='pulse'></p>
-        <a href='https://whatsapp.com/channel/0029VbDTbKN4CrfZ5GOmdY0i' target='_blank'>
-          <button>Join WhatsApp</button>
-        </a>
-      </div>
+      <div class='loader'></div>
+      <p id='count'></p>
+      <a href='https://whatsapp.com/channel/0029VbDTbKN4CrfZ5GOmdY0i' target='_blank'>
+        <button>Join WhatsApp</button>
+      </a>
     </div>
   </div>`;
 
@@ -179,7 +165,7 @@ function redirectPage(target){
   const timer=setInterval(()=>{
     document.getElementById('count').innerText = "Redirect in "+t+" sec";
     t--;
-    if(t<0){ clearInterval(timer); window.location.href = target; }
+    if(t<0){ clearInterval(timer); window.location.replace(target); }
   },1000);
 }
 
@@ -189,23 +175,13 @@ window.onload = function(){
 
   if(hash){
     const parts = hash.split('|');
-    const code = parts[0];
+    const target = decodeURL(parts[1]);
 
-    let target = null;
-
-    // PRIORITY: encoded URL (mobile safe)
-    if(parts[1]){
-      try{ target = atob(parts[1]); }catch{}
+    if(target){
+      redirectPage(target);
+    } else {
+      document.body.innerHTML = "<h2>Invalid Link</h2>";
     }
-
-    // fallback localStorage
-    if(!target){
-      const data = getData(code);
-      if(data) target = data.url;
-    }
-
-    if(target) redirectPage(target);
-    else document.body.innerHTML = "<h2>Invalid Link</h2>";
 
     return;
   }
