@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>XSafe Shortlik</title>
+<title>XSafe Shortlink</title>
 
 <style>
 body{margin:0;font-family:Arial;background:#0b1220;color:#fff}
@@ -47,13 +47,22 @@ async function fetchArticle(){
     const parser = new DOMParser();
     const xml = parser.parseFromString(text, "text/xml");
     const items = xml.querySelectorAll("item");
+
+    if(!items || items.length === 0) throw new Error('No items');
+
     const random = items[Math.floor(Math.random()*items.length)];
-    const title = random.querySelector("title")?.textContent;
-    const desc = random.querySelector("description")?.textContent;
-    return `<h2 style='text-align:center'>${title}</h2><p style='max-width:700px;margin:auto'>${desc}</p>`;
-  }catch{
-    return `<h2>Loading article...</h2>`;
+    const title = random.querySelector("title")?.textContent || "Latest News";
+    const desc = random.querySelector("description")?.textContent || "Content loading...";
+
+    return `<h2 style='text-align:center'>${title}</h2>
+            <p style='max-width:700px;margin:15px auto;line-height:1.6;text-align:center'>${desc}</p>`;
+
+  }catch(e){
+    // fallback article if API fails
+    return `<h2 style='text-align:center'>Latest Online Trends</h2>
+            <p style='max-width:700px;margin:15px auto;line-height:1.6;text-align:center'>Content creation and digital marketing continue to grow rapidly. Many creators are leveraging new strategies to reach global audiences and increase engagement.</p>`;
   }
+}
 }
 
 // ==============================
@@ -66,7 +75,7 @@ function generateOne(){
   let code = uniqueCode();
   while(localStorage.getItem(code)) code = uniqueCode();
 
-  const short = location.origin + '/xsafe/#' + code;
+  const short = location.origin + location.pathname + '#' + code;
 
   localStorage.setItem(code, JSON.stringify({url,clicks:0}));
 
@@ -85,7 +94,7 @@ function generateBulk(){
     let code = uniqueCode();
     while(localStorage.getItem(code)) code = uniqueCode();
 
-    const short = location.origin + '/xsafe/#' + code;
+    const short = location.origin + location.pathname + '#' + code;
 
     localStorage.setItem(code, JSON.stringify({url,clicks:0}));
 
@@ -178,11 +187,16 @@ window.onload = async function(){
 
     let t=8;
     const timer=setInterval(()=>{
-      document.getElementById('count').innerText = "Redirect in " + t + " sec";
+      const el = document.getElementById('count');
+      if(el) el.innerText = "Redirect in " + t + " sec";
       t--;
-      if(t<0){
+      if(t < 0){
         clearInterval(timer);
-        location.href=data.url;
+        if(data.url && data.url.startsWith('http')){
+          window.location.href = data.url;
+        } else {
+          alert('Invalid target URL');
+        }
       }
     },1000);
 
