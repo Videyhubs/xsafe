@@ -3,204 +3,110 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>XSafe ULTRA PRO++</title>
+<title>XSafe Short</title>
 
 <style>
-:root{
-  --bg:#0b1220; --card:#111827; --muted:#9ca3af; --primary:#22c55e; --accent:#38bdf8;
-}
-*{box-sizing:border-box}
-body{margin:0;font-family:Inter,system-ui,Arial;background:linear-gradient(135deg,#020617,#0b1220);color:#e5e7eb}
-header{position:sticky;top:0;background:rgba(2,6,23,.8);backdrop-filter:blur(10px);padding:14px 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #0f172a}
-header h1{margin:0;font-size:18px;letter-spacing:.5px}
-.container{max-width:1100px;margin:auto;padding:20px}
-.grid{display:grid;grid-template-columns:1.2fr .8fr;gap:18px}
-@media(max-width:900px){.grid{grid-template-columns:1fr}}
-.card{background:var(--card);border:1px solid #0f172a;border-radius:18px;padding:18px;box-shadow:0 10px 30px rgba(0,0,0,.5)}
-.row{display:flex;gap:10px;flex-wrap:wrap}
-input,textarea,select,button{border-radius:12px;border:1px solid #0f172a;background:#020617;color:#e5e7eb}
-input,textarea{padding:12px 14px;width:100%}
-textarea{min-height:120px;resize:vertical}
-button{padding:12px 16px;cursor:pointer;font-weight:600;background:linear-gradient(135deg,var(--primary),#16a34a);border:none}
-button.secondary{background:#020617;border:1px solid #0f172a}
-button:hover{transform:translateY(-1px)}
-.small{font-size:12px;color:var(--muted)}
-.kbd{padding:2px 6px;border-radius:6px;background:#020617;border:1px solid #0f172a}
-.list{max-height:420px;overflow:auto}
-.item{border:1px solid #0f172a;border-radius:14px;padding:12px;margin-bottom:10px}
-.badge{display:inline-block;padding:4px 8px;border-radius:999px;background:#020617;border:1px solid #0f172a;margin-right:6px}
-.copy{cursor:pointer;color:var(--accent)}
+body{margin:0;font-family:Arial;background:#0b1220;color:#fff}
+.container{max-width:900px;margin:auto;padding:20px}
+.card{background:#111827;padding:20px;border-radius:20px;margin-top:20px;text-align:center}
 </style>
 </head>
 
 <body>
-<header>
-  <h1>🚀 XSafe ULTRA PRO++</h1>
-  <div class="row">
-    <select id="lang" onchange="setLang(this.value)">
-      <option value="en">EN</option>
-      <option value="id">ID</option>
-      <option value="es">ES</option>
-      <option value="fr">FR</option>
-    </select>
-  </div>
-</header>
-
-<div class="container" id="app"></div>
+<div id="app"></div>
 
 <script>
-// ==============================
-// LANGUAGE
-// ==============================
-const L = {
-  en:{title:"Create Safe Link",bulk:"Bulk Shortener",ph:"Enter URL",phb:"Paste multiple URLs (one per line)",gen:"Generate",genb:"Generate Bulk",stats:"Statistics",wait:"Loading secure content...",redir:"Redirect in",copy:"Copy"},
-  id:{title:"Buat Link Aman",bulk:"Bulk Shortener",ph:"Masukkan URL",phb:"Tempel banyak URL (1 baris 1)",gen:"Generate",genb:"Generate Massal",stats:"Statistik",wait:"Memuat konten aman...",redir:"Redirect dalam",copy:"Salin"},
-  es:{title:"Crear enlace",bulk:"Bulk",ph:"Ingrese URL",phb:"Pegue múltiples URLs",gen:"Generar",genb:"Generar Lote",stats:"Estadísticas",wait:"Cargando...",redir:"Redirigiendo en",copy:"Copiar"},
-  fr:{title:"Créer lien",bulk:"Lot",ph:"Entrer URL",phb:"Collez plusieurs URLs",gen:"Générer",genb:"Générer lot",stats:"Statistiques",wait:"Chargement...",redir:"Redirection dans",copy:"Copier"}
-};
-let lang='en';
-function setLang(v){lang=v; render();}
 
 // ==============================
-// STRONG UNIQUE CODE (CRYPTO)
+// BOT DETECTION (CLOAKING)
 // ==============================
-function uniqueCode(){
-  const arr = new Uint8Array(12);
-  crypto.getRandomValues(arr);
-  return Array.from(arr).map(b=>b.toString(16).padStart(2,'0')).join('').slice(0,16);
+function isBot(){
+  return /facebookexternalhit|Facebot|FBAN|FBAV|Instagram|WhatsApp|bot|crawl|spider/i.test(navigator.userAgent);
 }
 
 // ==============================
-// RANDOM ARTICLE (LONG)
+// REAL ARTICLE API (FREE SOURCE)
 // ==============================
-function article(){
-  const t=["Growth Strategies That Work","Viral Content Secrets","Monetization Blueprint","Audience Building Tips","Creator Playbook"];
-  const p=[
-    "Content creation is one of the fastest-growing opportunities online.",
-    "Consistency and audience understanding drive sustainable growth.",
-    "Leverage trends but keep your unique voice to stand out.",
-    "Diversify monetization with ads, affiliates, and partnerships.",
-    "Data-driven decisions will improve your long-term performance."
-  ];
-  let h = `<h2>${t[Math.floor(Math.random()*t.length)]}</h2>`;
-  for(let i=0;i<6;i++) h+=`<p>${p[Math.floor(Math.random()*p.length)]}</p>`;
-  return h;
-}
+async function fetchArticle(){
+  try{
+    const res = await fetch('https://api.allorigins.win/raw?url=https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml');
+    const text = await res.text();
 
-// ==============================
-// STORAGE HELPERS
-// ==============================
-function save(code,data){ localStorage.setItem(code, JSON.stringify(data)); }
-function get(code){ return JSON.parse(localStorage.getItem(code)); }
+    const parser = new DOMParser();
+    const xml = parser.parseFromString(text, "text/xml");
+    const items = xml.querySelectorAll("item");
 
-// ==============================
-// UI
-// ==============================
-function render(){
-  const t=L[lang];
-  document.getElementById('app').innerHTML = `
-  <div class="grid">
-    <div class="card">
-      <h3>${t.title}</h3>
-      <div class="row">
-        <input id="url" placeholder="${t.ph}" />
-        <button onclick="generateOne()">${t.gen}</button>
-      </div>
-      <div id="result" class="small"></div>
+    const random = items[Math.floor(Math.random()*items.length)];
 
-      <hr style="border-color:#0f172a;margin:16px 0"/>
+    const title = random.querySelector("title")?.textContent || "Latest News";
+    const desc = random.querySelector("description")?.textContent || "";
 
-      <h3>${t.bulk}</h3>
-      <textarea id="bulk" placeholder="${t.phb}"></textarea>
-      <div class="row">
-        <button onclick="generateBulk()">${t.genb}</button>
-        <button class="secondary" onclick="clearBulk()">Clear</button>
-      </div>
-      <div id="bulkResult" class="small"></div>
-    </div>
+    return `
+      <h2>${title}</h2>
+      <p style="max-width:700px;margin:auto;line-height:1.6">${desc}</p>
+    `;
 
-    <div class="card">
-      <h3>${t.stats}</h3>
-      <div id="stats" class="list"></div>
-    </div>
-  </div>`;
-  loadStats();
-}
-
-// ==============================
-// GENERATE SINGLE
-// ==============================
-function generateOne(){
-  const url = document.getElementById('url').value.trim();
-  if(!url) return alert('Enter URL');
-  let code = uniqueCode();
-  while(localStorage.getItem(code)){ code = uniqueCode(); }
-  const short = location.origin + '/xsafe/#' + code;
-  save(code,{url,clicks:0,created:new Date().toLocaleString()});
-  document.getElementById('result').innerHTML = `<div class="item"><span class="badge">NEW</span> <span class="copy" onclick="copyText('${short}')">${short}</span></div>`;
-  loadStats();
-}
-
-// ==============================
-// GENERATE BULK
-// ==============================
-function generateBulk(){
-  const lines = (document.getElementById('bulk').value||'').split(/\n+/).map(s=>s.trim()).filter(Boolean);
-  if(!lines.length) return alert('No URLs');
-  let out='';
-  lines.forEach(url=>{
-    let code = uniqueCode();
-    while(localStorage.getItem(code)){ code = uniqueCode(); }
-    const short = location.origin + '/xsafe/#' + code;
-    save(code,{url,clicks:0,created:new Date().toLocaleString()});
-    out += `<div class="item"><span class="badge">BULK</span> <span class="copy" onclick="copyText('${short}')">${short}</span></div>`;
-  });
-  document.getElementById('bulkResult').innerHTML = out;
-  loadStats();
-}
-function clearBulk(){ document.getElementById('bulk').value=''; document.getElementById('bulkResult').innerHTML=''; }
-
-// ==============================
-// STATS
-// ==============================
-function loadStats(){
-  let html='';
-  for(let i=0;i<localStorage.length;i++){
-    const k = localStorage.key(i);
-    const d = get(k);
-    if(!d||!d.url) continue;
-    const s = location.origin + '/xsafe/#' + k;
-    html += `<div class="item"><div class="small">${d.created}</div><div><b>${s}</b></div><div class="small">Clicks: ${d.clicks}</div></div>`;
+  }catch(e){
+    return `<h2>Loading content...</h2><p>Preparing article...</p>`;
   }
-  document.getElementById('stats').innerHTML = html;
 }
 
-// ==============================
-// COPY
-// ==============================
-function copyText(t){ navigator.clipboard.writeText(t); alert(L[lang].copy+': '+t); }
 
 // ==============================
-// BOT DETECT
+// REDIRECT SYSTEM (CLOAK MODE)
 // ==============================
-function isBot(){ return /facebookexternalhit|Facebot|FBAN|FBAV|Instagram|WhatsApp/i.test(navigator.userAgent); }
+window.onload = async function(){
 
-// ==============================
-// REDIRECT
-// ==============================
-window.onload = function(){
   const hash = location.hash.replace('#','');
+
   if(hash){
-    const d = get(hash);
-    if(!d) return;
-    if(isBot()){ document.body.innerHTML='<h2>Content unavailable</h2>'; return; }
-    d.clicks++; save(hash,d);
-    document.body.innerHTML = `<div class="container"><div class="card">${article()}<p>${L[lang].wait}</p><p id="c"></p></div></div>`;
-    let t=7; const it=setInterval(()=>{ document.getElementById('c').innerText = L[lang].redir+" "+t+" sec"; t--; if(t<0){clearInterval(it); location.href=d.url;} },1000);
+    const data = JSON.parse(localStorage.getItem(hash));
+    if(!data) return;
+
+    // BOT = show safe page only
+    if(isBot()){
+      document.body.innerHTML = "<h2>Welcome to our website</h2>";
+      return;
+    }
+
+    // REAL USER = show article
+    const article = await fetchArticle();
+
+    document.body.innerHTML = `
+      <div class="container">
+        <div class="card">
+          ${article}
+          <p>Loading secure page...</p>
+          <p id="count"></p>
+        </div>
+      </div>
+    `;
+
+    let t = 8;
+    const timer = setInterval(()=>{
+      document.getElementById('count').innerText = "Redirect in " + t + " sec";
+      t--;
+
+      if(t < 0){
+        clearInterval(timer);
+        window.location.href = data.url;
+      }
+    },1000);
+
     return;
   }
-  render();
+
+  // DEFAULT PAGE
+  document.getElementById('app').innerHTML = `
+    <div class="container">
+      <div class="card">
+        <h2>XSafe GOD MODE ACTIVE</h2>
+        <p>Your cloaking + real article system is running.</p>
+      </div>
+    </div>
+  `;
 }
+
 </script>
 </body>
 </html>
