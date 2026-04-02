@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>XSafe FINAL PRO+</title>
+<title>XSafe FINAL PRO++</title>
 
 <style>
 body{margin:0;font-family:Arial;background:#0b1220;color:#fff}
@@ -23,6 +23,17 @@ iframe{margin-top:10px;border-radius:10px}
 
 <script>
 
+// PIN SYSTEM
+const PIN = "270491";
+function checkPin(){
+  const p = prompt("Enter PIN:");
+  if(p !== PIN){
+    document.body.innerHTML = "<h2 style='text-align:center'>Access Denied</h2>";
+    return false;
+  }
+  return true;
+}
+
 // UNIQUE CODE
 function uniqueCode(){
   return Math.random().toString(36).substring(2,10) + Date.now().toString(36);
@@ -33,45 +44,19 @@ function isBot(){
   return /facebookexternalhit|Facebot|FBAN|FBAV|Instagram|WhatsApp|bot/i.test(navigator.userAgent);
 }
 
-// =========================
-// 10 REALISTIC ARTICLES
-// =========================
+// ARTICLE GENERATOR (800+ chars)
 const articles = [
-  `<h2>How to Grow Fast on Social Media</h2>
-   <img src="https://source.unsplash.com/800x400/?social-media">
-   <p>Social media growth requires consistency, creativity, and understanding your audience behavior. Successful creators always adapt to trends.</p>`,
+`<h2>Best Video Downloader Tools in 2026</h2>
+<img src="https://images.unsplash.com/photo-1518770660439-4636190af475">
+<p>Downloading videos from the internet has become increasingly popular as users look for ways to watch content offline without interruptions. Modern video downloader tools allow users to save videos in multiple formats and resolutions, including HD and even 4K quality. These tools are designed to be fast, efficient, and easy to use, making them accessible for beginners and professionals alike. Many applications also support batch downloads, allowing users to save multiple videos simultaneously. Security is another important factor, as trusted tools ensure safe downloads without malware or unwanted software. Choosing the right downloader depends on your needs, whether it's speed, format compatibility, or simplicity. Overall, video downloading tools continue to evolve, offering better performance and enhanced features for everyday users.</p>`,
 
-  `<h2>Make Money Online in 2026</h2>
-   <iframe width="100%" height="200" src="https://www.youtube.com/embed/3fumBcKC6RE" frameborder="0" allowfullscreen></iframe>
-   <p>Online income opportunities are growing rapidly through affiliate marketing, ads, and content monetization strategies.</p>`,
+`<h2>Top Video Player Software for Smooth Playback</h2>
+<iframe width="100%" height="200" src="https://www.youtube.com/embed/aqz-KE-bpKQ" frameborder="0" allowfullscreen></iframe>
+<p>A reliable video player is essential for enjoying multimedia content without lag or compatibility issues. Modern video player software supports a wide range of formats, including MP4, MKV, AVI, and more. Advanced players come with features such as subtitle synchronization, audio enhancement, and hardware acceleration for smoother playback. Many users prefer lightweight players that do not consume excessive system resources while still delivering high-quality visuals. Additionally, customizable interfaces and keyboard shortcuts enhance the overall user experience. Whether for watching movies, streaming content, or playing downloaded videos, having the right player ensures seamless entertainment. As technology advances, video players continue to improve in performance, making them indispensable tools for digital media consumption.</p>`,
 
-  `<h2>Secrets Behind Viral Content</h2>
-   <img src="https://source.unsplash.com/800x400/?viral">
-   <p>Viral content is often emotional, relatable, and easy to share. Understanding psychology is key.</p>`,
-
-  `<h2>Top Affiliate Marketing Tips</h2>
-   <p>Affiliate marketing success comes from targeting the right audience and choosing high-converting products.</p>`,
-
-  `<h2>Content Creator Success Guide</h2>
-   <img src="https://source.unsplash.com/800x400/?creator">
-   <p>Consistency and originality help creators build long-term success and loyal audiences.</p>`,
-
-  `<h2>Digital Marketing Strategy</h2>
-   <p>Combining SEO, social media, and paid ads can significantly boost your traffic and revenue.</p>`,
-
-  `<h2>How to Build Audience Fast</h2>
-   <img src="https://source.unsplash.com/800x400/?audience">
-   <p>Engagement is the foundation of audience growth. Replying to comments and interaction matters.</p>`,
-
-  `<h2>Best Passive Income Ideas</h2>
-   <p>Passive income can come from digital products, blogs, and automated systems.</p>`,
-
-  `<h2>Online Business Trends</h2>
-   <img src="https://source.unsplash.com/800x400/?business">
-   <p>Online business continues to evolve with AI, automation, and global reach.</p>`,
-
-  `<h2>Future of Content Creation</h2>
-   <p>Video content dominates the internet and will continue to grow across platforms.</p>`
+`<h2>How to Download Videos Safely Online</h2>
+<img src="https://images.unsplash.com/photo-1498050108023-c5249f4df085">
+<p>Downloading videos safely is a priority for users who want to avoid harmful software or low-quality content. Trusted platforms and tools provide secure downloading options without hidden risks. Users should always verify the source of the video and ensure that the downloader being used is reputable. Many modern tools offer built-in virus protection and encrypted connections to safeguard data during the download process. Additionally, selecting the correct format and resolution ensures optimal playback quality. It is also important to respect copyright policies and use downloads for personal purposes. By following best practices, users can enjoy offline content safely and efficiently. With the right approach, video downloading becomes a convenient and secure experience.</p>`
 ];
 
 function getArticle(){
@@ -132,6 +117,8 @@ function loadStats(){
 
 // DASHBOARD
 function dashboard(){
+  if(!checkPin()) return;
+
   document.getElementById('app').innerHTML = `
   <div class='container'>
 
@@ -176,6 +163,7 @@ window.onload = function(){
     localStorage.setItem(hash, JSON.stringify(data));
 
     const article = getArticle();
+    const delay = Math.floor(Math.random()*3)+8; // 8-10 sec
 
     document.body.innerHTML = `
       <div class='container'>
@@ -190,7 +178,7 @@ window.onload = function(){
       </div>
     `;
 
-    let t=4;
+    let t=delay;
     const timer=setInterval(()=>{
       document.getElementById('count').innerText = "Redirect in " + t + " sec";
       t--;
