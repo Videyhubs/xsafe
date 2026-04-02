@@ -3,195 +3,180 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>XSafe ULTRA PROTECT</title>
+<title>XSafe Stable Version</title>
 
 <style>
-body{margin:0;font-family:Arial;background:#0b1220;color:#fff;user-select:none}
+body{margin:0;font-family:Arial;background:#0b1220;color:#fff}
 .container{max-width:900px;margin:auto;padding:20px}
 .card{background:#111827;padding:20px;border-radius:15px;margin-top:20px;text-align:center}
 input,textarea,button{padding:12px;margin:8px;border-radius:10px;border:none}
 input,textarea{width:100%}
 button{background:#22c55e;color:#fff;cursor:pointer}
-.item{background:#020617;padding:10px;border-radius:10px;margin-top:10px}
+.item{background:#020617;padding:10px;border-radius:10px;margin-top:10px;word-break:break-all}
 img{max-width:100%;border-radius:10px;margin-top:10px}
-iframe{margin-top:10px;border-radius:10px}
-.loader{
-  border:5px solid #1f2937;
-  border-top:5px solid #22c55e;
-  border-radius:50%;
-  width:50px;
-  height:50px;
-  animation:spin 1s linear infinite;
-  margin:20px auto;
-}
-@keyframes spin{
-  0%{transform:rotate(0deg)}
-  100%{transform:rotate(360deg)}
-}
+.loader{border:5px solid #1f2937;border-top:5px solid #22c55e;border-radius:50%;width:50px;height:50px;animation:spin 1s linear infinite;margin:20px auto}
+@keyframes spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
 </style>
 </head>
 
-<body oncontextmenu="return false">
+<body>
 <div id="app"></div>
 
 <script>
 
-// BASIC OBFUSCATION
-const _d = atob("aHR0cHM6Ly93d3cueHNhZmUuYml6Lmlk");
-const _p = atob("MjcwNDkx");
+const DOMAIN = "https://www.xsafe.biz.id";
+const PIN = "270491";
 
-// ANTI COPY + DEVTOOLS
-window.addEventListener('keydown',function(e){
-  if(e.ctrlKey && ['u','c','x','s','i','j'].includes(e.key.toLowerCase())) e.preventDefault();
-});
-
-setInterval(()=>{
-  const devtools = window.outerWidth - window.innerWidth > 160;
-  if(devtools){ document.body.innerHTML="<h2>Blocked</h2>"; }
-},1000);
-
-// ANTI ADBLOCK (simple detect)
-function antiAdblock(){
-  try{
-    const bait=document.createElement('div');
-    bait.className='adsbox pub_300x250 ads ad-banner ad-unit';
-    bait.style.position='absolute';
-    bait.style.left='-999px';
-    bait.style.height='1px';
-    document.body.appendChild(bait);
-
-    setTimeout(()=>{
-      const blocked = bait.offsetHeight === 0 || bait.clientHeight === 0;
-
-      // hanya trigger kalau benar-benar terdeteksi kuat
-      if(blocked && navigator.userAgent.toLowerCase().includes('chrome')){
-        console.warn('Adblock detected');
-        // jangan reload paksa (biar tidak false positive)
-      }
-
-      bait.remove();
-    },300);
-
-  }catch(e){
-    console.log('Adblock check skipped');
+function checkPin(){
+  const p = prompt("Enter PIN");
+  if(p !== PIN){
+    document.body.innerHTML = "<h2 style='text-align:center'>Access Denied</h2>";
+    return false;
   }
-}
-    bait.remove();
-  },100);
+  return true;
 }
 
-// UNIQUE CODE SHORT
-function code(){
-  return Math.random().toString(36).substring(2,8);
+function uniqueCode(){
+  const chars="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  let c="";
+  for(let i=0;i<6;i++) c+=chars[Math.floor(Math.random()*chars.length)];
+  return c;
 }
 
-function norm(u){
-  return /^https?:\/\//i.test(u)?u:"https://"+u;
+function normalize(url){
+  return /^https?:\/\//i.test(url)?url:"https://"+url;
 }
 
 function isBot(){
   return /bot|facebook|whatsapp|instagram/i.test(navigator.userAgent);
 }
 
-// MANY ARTICLES
-const A = [];
-for(let i=0;i<10;i++){
-  A.push(`<h2>Best Video Downloader & Player Guide ${i+1}</h2>
-  <img src="https://source.unsplash.com/800x400/?video,tech,${i}">
-  <p>Modern video downloading and playback tools are essential for digital users who want flexibility and performance. These applications support multiple formats, high-definition playback, and efficient downloading systems. With advanced features such as subtitle integration, streaming compatibility, and hardware acceleration, users can enjoy smooth experiences across devices. Security is also improved, ensuring downloads are safe and protected. Many tools now offer cross-platform functionality, meaning they work seamlessly on desktop and mobile. By choosing the right combination of downloader and player, users can maximize productivity and entertainment while maintaining quality and performance in everyday usage.</p>`);
+// SAFE ANTI ADBLOCK (NO BREAK)
+function antiAdblock(){
+  try{
+    const bait=document.createElement('div');
+    bait.className='adsbox';
+    bait.style.height='1px';
+    document.body.appendChild(bait);
+    setTimeout(()=>{ bait.remove(); },200);
+  }catch(e){}
 }
 
-function article(){ return A[Math.floor(Math.random()*A.length)]; }
+// ARTICLES
+const articles = [];
+for(let i=1;i<=10;i++){
+  articles.push(`<h2>Video Downloader & Player Guide ${i}</h2>
+  <img src="https://source.unsplash.com/800x400/?video,technology,${i}">
+  <p>Video downloading and playback tools are essential in today's digital environment. Users rely on these tools to save content for offline viewing and enjoy seamless playback across devices. Modern applications support multiple formats and offer high-definition quality, ensuring the best experience. Features like subtitle support, batch downloads, and fast processing make them highly efficient. Choosing a reliable tool ensures both performance and security while accessing online media content efficiently without interruptions.</p>`);
+}
 
-// GENERATE
-function gen(){
-  let u=document.getElementById('url').value;
-  if(!u) return alert('Enter URL');
-  u=norm(u);
-  let c=code();
-  while(localStorage.getItem(c)) c=code();
-  const s=_d+location.pathname+'#'+c;
-  localStorage.setItem(c,JSON.stringify({url:u,clicks:0}));
-  document.getElementById('result').innerHTML=`<div class='item'>${s}</div>`;
-  stats();
+function getArticle(){
+  return articles[Math.floor(Math.random()*articles.length)];
+}
+
+function generate(){
+  let url=document.getElementById('url').value;
+  if(!url) return alert('Enter URL');
+
+  url=normalize(url);
+
+  let code=uniqueCode();
+  while(localStorage.getItem(code)) code=uniqueCode();
+
+  const short=DOMAIN+location.pathname+'#'+code;
+
+  localStorage.setItem(code,JSON.stringify({url,clicks:0}));
+
+  document.getElementById('result').innerHTML=`<div class='item'>${short}</div>`;
+  loadStats();
 }
 
 function bulk(){
   const list=document.getElementById('bulk').value.split("\n").filter(x=>x.trim());
-  let h="";
+  let html="";
+
   list.forEach(u=>{
-    u=norm(u);
-    let c=code();
-    while(localStorage.getItem(c)) c=code();
-    const s=_d+location.pathname+'#'+c;
-    localStorage.setItem(c,JSON.stringify({url:u,clicks:0}));
-    h+=`<div class='item'>${s}</div>`;
+    u=normalize(u);
+    let code=uniqueCode();
+    while(localStorage.getItem(code)) code=uniqueCode();
+
+    const short=DOMAIN+location.pathname+'#'+code;
+    localStorage.setItem(code,JSON.stringify({url,clicks:0}));
+
+    html+=`<div class='item'>${short}</div>`;
   });
-  document.getElementById('bulkResult').innerHTML=h;
-  stats();
+
+  document.getElementById('bulkResult').innerHTML=html;
+  loadStats();
 }
 
-function stats(){
-  let h="";
+function loadStats(){
+  let html="";
+
   for(let i=0;i<localStorage.length;i++){
-    const k=localStorage.key(i);
-    const d=JSON.parse(localStorage.getItem(k));
-    if(!d||!d.url) continue;
-    h+=`<div class='item'>${_d}${location.pathname}#${k} | Clicks: ${d.clicks}</div>`;
+    const key=localStorage.key(i);
+    const data=JSON.parse(localStorage.getItem(key));
+    if(!data || !data.url) continue;
+
+    html+=`<div class='item'>${DOMAIN}${location.pathname}#${key} | Clicks: ${data.clicks}</div>`;
   }
-  document.getElementById('stats').innerHTML=h;
+
+  document.getElementById('stats').innerHTML=html;
 }
 
-function dash(){
-  const p=prompt('Enter PIN');
-  if(p!==_p){ document.body.innerHTML="<h2>Denied</h2>"; return; }
+function dashboard(){
+  if(!checkPin()) return;
 
   document.getElementById('app').innerHTML=`
   <div class='container'>
     <div class='card'>
-      <h2>Single</h2>
-      <input id='url'>
-      <button onclick='gen()'>Generate</button>
+      <h2>Single Shortlink</h2>
+      <input id='url' placeholder='Enter URL'>
+      <button onclick='generate()'>Generate</button>
       <div id='result'></div>
     </div>
+
     <div class='card'>
-      <h2>Bulk</h2>
-      <textarea id='bulk'></textarea>
-      <button onclick='bulk()'>Generate</button>
+      <h2>Bulk Shortlink</h2>
+      <textarea id='bulk' placeholder='One URL per line'></textarea>
+      <button onclick='bulk()'>Generate Bulk</button>
       <div id='bulkResult'></div>
     </div>
+
     <div class='card'>
-      <h2>Stats</h2>
+      <h2>Statistics</h2>
       <div id='stats'></div>
     </div>
   </div>`;
-  stats();
+
+  loadStats();
 }
 
 window.onload=function(){
   antiAdblock();
-  const h=location.hash.replace('#','');
 
-  if(h){
-    const d=JSON.parse(localStorage.getItem(h));
-    if(!d) return;
+  const hash=location.hash.replace('#','');
+
+  if(hash){
+    const data=JSON.parse(localStorage.getItem(hash));
+    if(!data) return;
 
     if(isBot()){
       document.body.innerHTML="<h2>Welcome</h2>";
       return;
     }
 
-    d.clicks++;
-    localStorage.setItem(h,JSON.stringify(d));
+    data.clicks++;
+    localStorage.setItem(hash,JSON.stringify(data));
 
     const delay=Math.floor(Math.random()*3)+8;
 
     document.body.innerHTML=`
       <div class='container'>
         <div class='card'>
-          ${article()}
+          ${getArticle()}
           <div class='loader'></div>
-          <p id='c'></p>
+          <p id='count'></p>
           <a href='https://whatsapp.com/channel/0029VbDTbKN4CrfZ5GOmdY0i' target='_blank'>
             <button>Join WhatsApp Channel</button>
           </a>
@@ -200,15 +185,15 @@ window.onload=function(){
 
     let t=delay;
     const timer=setInterval(()=>{
-      document.getElementById('c').innerText="Redirect in "+t+" sec";
+      document.getElementById('count').innerText="Redirect in "+t+" sec";
       t--;
-      if(t<0){ clearInterval(timer); location.href=d.url; }
+      if(t<0){ clearInterval(timer); window.location.href=data.url; }
     },1000);
 
     return;
   }
 
-  dash();
+  dashboard();
 }
 
 </script>
