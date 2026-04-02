@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>XSafe PRO MAX FIXED</title>
+<title>XSafe Shortlink</title>
 
 <style>
 body{margin:0;font-family:Arial;background:#0b1220;color:#fff}
@@ -15,13 +15,13 @@ button{background:#22c55e;color:#fff;cursor:pointer}
 .item{background:#020617;padding:10px;border-radius:10px;margin-top:10px;word-break:break-all}
 img{max-width:100%;border-radius:10px;margin:15px 0}
 
-.centerBox{display:flex;flex-direction:column;align-items:center;justify-content:center}
+.center-box{display:flex;flex-direction:column;align-items:center;justify-content:center}
 
-.loader{width:60px;height:60px;border-radius:50%;border:5px solid #1f2937;border-top:5px solid #22c55e;animation:spin 1s linear infinite;margin:15px auto}
+.loader{margin:20px auto;width:60px;height:60px;border-radius:50%;border:5px solid #1f2937;border-top:5px solid #22c55e;animation:spin 1s linear infinite}
 @keyframes spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
 
-.pulse{animation:pulse 1.2s infinite}
-@keyframes pulse{0%{opacity:0.5}50%{opacity:1}100%{opacity:0.5}}
+.pulse{animation:pulse 1.5s infinite}
+@keyframes pulse{0%{opacity:.4}50%{opacity:1}100%{opacity:.4}}
 </style>
 </head>
 
@@ -30,129 +30,183 @@ img{max-width:100%;border-radius:10px;margin:15px 0}
 
 <script>
 
-// SECURITY LIGHT (mobile safe)
-document.addEventListener('contextmenu',e=>e.preventDefault());
+// ================= CONFIG =================
+const PIN = "270491";
+const DOMAIN = "https://www.xsafe.biz.id";
 
-// CONFIG
-const PIN="270491";
-const DOMAIN="https://www.xsafe.biz.id";
+// ================= STORAGE SAFE =================
+function saveData(code,data){
+  localStorage.setItem(code, JSON.stringify(data));
+}
+function getData(code){
+  let data = localStorage.getItem(code);
+  if(!data) return null;
+  return JSON.parse(data);
+}
 
-// PIN
+// ================= PIN =================
 function showPin(){
-  app.innerHTML=`<div class='container'><div class='card'><h2>Enter PIN</h2><input id='pinInput' type='password'><button onclick='loginPin()'>Unlock</button></div></div>`;
+  document.getElementById('app').innerHTML = `
+  <div class='container'>
+    <div class='card'>
+      <h2>Enter PIN</h2>
+      <input id='pinInput' type='password'>
+      <button onclick='loginPin()'>Unlock</button>
+    </div>
+  </div>`;
 }
+
 function loginPin(){
-  if(pinInput.value===PIN){localStorage.setItem('xsafe_pin',PIN);dashboard();}
-  else alert('Wrong PIN');
+  const val = document.getElementById('pinInput').value;
+  if(val===PIN){
+    localStorage.setItem('xsafe_pin', PIN);
+    dashboard();
+  } else alert('Wrong PIN');
 }
-function isLogged(){return localStorage.getItem('xsafe_pin')===PIN}
 
-// UTIL
-function normalize(u){return /^https?:\/\//i.test(u)?u:"https://"+u}
-function uniqueCode(){return Math.random().toString(36).substring(2,7)}
-function copyText(t){navigator.clipboard.writeText(t)}
+function isLogged(){
+  return localStorage.getItem('xsafe_pin')===PIN;
+}
 
-// ARTICLES (fast + real image)
+// ================= UTIL =================
+function normalize(url){
+  return /^https?:\/\//i.test(url)?url:"https://"+url;
+}
+
+function uniqueCode(){
+  return Math.random().toString(36).substring(2,6);
+}
+
+function copyText(text){
+  navigator.clipboard.writeText(text);
+  alert('Copied');
+}
+
+// ================= ARTICLES =================
 function getArticle(){
-  const img=`https://picsum.photos/800/400?random=${Math.floor(Math.random()*10000)}`;
+  const img = "https://picsum.photos/800/400?random="+Math.random();
   return `
   <h2>Best Video Downloader & Player</h2>
   <img src="${img}">
   <p>
-  Video downloader and player software are essential tools for modern users who want full control over their media experience. These tools allow fast downloads, smooth playback, and support for multiple formats including MP4, MKV, and high-definition videos. Many applications now include advanced features such as subtitle support, playback speed control, and hardware acceleration to ensure a seamless experience across devices. Choosing the right tool can significantly improve how you consume content online, especially when dealing with large video files or streaming platforms.
+  Video downloading and playback software has become essential for users who want flexibility in consuming digital content. These tools allow users to download videos from various platforms and store them locally for offline viewing. Modern applications support multiple formats such as MP4, AVI, and MKV, along with HD and 4K quality options. In addition to downloading, video players now come equipped with powerful features like subtitle synchronization, playback speed control, and hardware acceleration. These features enhance the viewing experience and ensure smooth performance even on lower-end devices.
   </p>`;
 }
 
-// GENERATE
+// ================= GENERATE =================
 function generate(){
-  let url=normalize(document.getElementById('url').value);
+  let url = document.getElementById('url').value;
   if(!url) return alert('Enter URL');
 
-  let code=uniqueCode();
-  while(localStorage.getItem(code)) code=uniqueCode();
+  url = normalize(url);
 
-  const short=DOMAIN+location.pathname+'#'+code;
-  localStorage.setItem(code,JSON.stringify({url,clicks:0}));
+  let code = uniqueCode();
+  while(localStorage.getItem(code)) code = uniqueCode();
 
-  result.innerHTML=`<div class='item'>${short}<br><button onclick="copyText('${short}')">Copy</button></div>`;
+  // IMPORTANT FIX: embed target in URL (mobile safe)
+  const encoded = btoa(url);
+
+  const short = DOMAIN + location.pathname + '#' + code + "|" + encoded;
+
+  saveData(code,{url,clicks:0});
+
+  document.getElementById('result').innerHTML = `
+  <div class='item'>${short}<br>
+  <button onclick="copyText('${short}')">Copy</button>
+  </div>`;
 }
 
-// BULK
 function bulk(){
-  const list=bulkInput.value.split("\n").filter(x=>x.trim());
+  const list = document.getElementById('bulk').value.split("\n").filter(x=>x.trim());
   let html="";
 
   list.forEach(u=>{
-    let url=normalize(u);
-    let code=uniqueCode();
-    while(localStorage.getItem(code)) code=uniqueCode();
+    let url = normalize(u);
+    let code = uniqueCode();
 
-    const short=DOMAIN+location.pathname+'#'+code;
-    localStorage.setItem(code,JSON.stringify({url,clicks:0}));
+    const encoded = btoa(url);
+    const short = DOMAIN + location.pathname + '#' + code + "|" + encoded;
 
-    html+=`<div class='item'>${short}<br><button onclick="copyText('${short}')">Copy</button></div>`;
+    saveData(code,{url,clicks:0});
+
+    html += `<div class='item'>${short}<br><button onclick="copyText('${short}')">Copy</button></div>`;
   });
 
-  bulkResult.innerHTML=html;
+  document.getElementById('bulkResult').innerHTML = html;
 }
 
-// DASHBOARD
+// ================= DASHBOARD =================
 function dashboard(){
-  app.innerHTML=`
+  document.getElementById('app').innerHTML = `
   <div class='container'>
+
     <div class='card'>
-      <h2>Single</h2>
-      <input id='url'>
+      <h2>Single Shortlink</h2>
+      <input id='url' placeholder='Enter URL'>
       <button onclick='generate()'>Generate</button>
       <div id='result'></div>
     </div>
 
     <div class='card'>
-      <h2>Bulk</h2>
-      <textarea id='bulkInput'></textarea>
-      <button onclick='bulk()'>Generate</button>
+      <h2>Bulk Shortlink</h2>
+      <textarea id='bulk'></textarea>
+      <button onclick='bulk()'>Generate Bulk</button>
       <div id='bulkResult'></div>
     </div>
+
   </div>`;
 }
 
-// REDIRECT (mobile FIX)
-function redirectPage(data){
-  const delay=Math.floor(Math.random()*3)+8;
+// ================= REDIRECT =================
+function redirectPage(target){
+  const delay = Math.floor(Math.random()*3)+5; // faster
 
-  app.innerHTML=`
+  document.getElementById('app').innerHTML = `
   <div class='container'>
     <div class='card'>
       ${getArticle()}
-      <div class='centerBox'>
+      <div class='center-box'>
         <div class='loader'></div>
         <p id='count' class='pulse'></p>
-        <button onclick="goNow('${data.url}')">Continue</button>
-        <a href='https://whatsapp.com/channel/0029VbDTbKN4CrfZ5GOmdY0i' target='_blank'><button>Join WhatsApp</button></a>
+        <a href='https://whatsapp.com/channel/0029VbDTbKN4CrfZ5GOmdY0i' target='_blank'>
+          <button>Join WhatsApp</button>
+        </a>
       </div>
     </div>
   </div>`;
 
   let t=delay;
   const timer=setInterval(()=>{
-    count.innerText="Redirect in "+t+" sec";
+    document.getElementById('count').innerText = "Redirect in "+t+" sec";
     t--;
-    if(t<0){clearInterval(timer);goNow(data.url);} 
-  },800);
+    if(t<0){ clearInterval(timer); window.location.href = target; }
+  },1000);
 }
 
-function goNow(url){
-  window.location.href=url;
-  setTimeout(()=>{window.location.assign(url)},300);
-}
-
-// INIT
-window.onload=function(){
-  const hash=location.hash.replace('#','');
+// ================= INIT =================
+window.onload = function(){
+  const hash = location.hash.replace('#','');
 
   if(hash){
-    const data=JSON.parse(localStorage.getItem(hash));
-    if(data) redirectPage(data);
+    const parts = hash.split('|');
+    const code = parts[0];
+
+    let target = null;
+
+    // PRIORITY: encoded URL (mobile safe)
+    if(parts[1]){
+      try{ target = atob(parts[1]); }catch{}
+    }
+
+    // fallback localStorage
+    if(!target){
+      const data = getData(code);
+      if(data) target = data.url;
+    }
+
+    if(target) redirectPage(target);
+    else document.body.innerHTML = "<h2>Invalid Link</h2>";
+
     return;
   }
 
