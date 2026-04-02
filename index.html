@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>XSafe Ultimate Version</title>
+<title>XSafe Shortlink</title>
 
 <style>
 body{margin:0;font-family:Arial;background:#0b1220;color:#fff}
@@ -13,18 +13,8 @@ input,textarea,button{padding:12px;margin:8px;border-radius:10px;border:none}
 input,textarea{width:100%}
 button{background:#22c55e;color:#fff;cursor:pointer}
 .item{background:#020617;padding:10px;border-radius:10px;margin-top:10px;word-break:break-all}
-img{max-width:100%;border-radius:10px;margin-top:10px}
-
-/* LOADER ANIMATION */
-.loader{
-  width:60px;height:60px;margin:20px auto;
-  border-radius:50%;
-  border:6px solid #1f2937;
-  border-top:6px solid #22c55e;
-  animation:spin 0.8s linear infinite, pulse 1.5s ease-in-out infinite;
-}
+.loader{width:60px;height:60px;margin:20px auto;border-radius:50%;border:6px solid #1f2937;border-top:6px solid #22c55e;animation:spin 1s linear infinite}
 @keyframes spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
-@keyframes pulse{0%,100%{box-shadow:0 0 10px #22c55e}50%{box-shadow:0 0 25px #22c55e}}
 </style>
 </head>
 
@@ -33,256 +23,160 @@ img{max-width:100%;border-radius:10px;margin-top:10px}
 
 <script>
 
-// =========================
-// ANTI COPY / DEVTOOLS
-// =========================
-document.addEventListener('contextmenu', e => e.preventDefault());
-document.addEventListener('copy', e => e.preventDefault());
-document.addEventListener('keydown', function(e){
-  if(e.key === 'F12' || (e.ctrlKey && e.shiftKey && ['I','J','C'].includes(e.key))){
-    e.preventDefault();
-  }
-});
-
-// =========================
-// CONFIG
-// =========================
-const DOMAIN = "https://www.xsafe.biz.id";
+// ================= CONFIG =================
 const PIN = "270491";
+const DOMAIN = "https://xsafe.biz.id";
 
-function renderPinScreen(){
-  const app = document.getElementById('app');
-  app.innerHTML = `
+// ================= PIN UI =================
+function showPin(){
+  document.getElementById('app').innerHTML = `
     <div class='container'>
       <div class='card'>
         <h2>Enter PIN</h2>
-        <input id='pinInput' type='password' placeholder='Enter PIN'>
-        <button onclick='submitPin()'>Unlock</button>
+        <input id='pinInput' type='password'>
+        <button onclick='loginPin()'>Unlock</button>
       </div>
     </div>`;
 }
 
-function submitPin(){
+function loginPin(){
   const val = document.getElementById('pinInput').value;
   if(val === PIN){
     localStorage.setItem('xsafe_pin', PIN);
-    dashboard(true);
+    dashboard();
   } else {
     alert('Wrong PIN');
   }
 }
 
-function checkPin(){
-  const saved = localStorage.getItem('xsafe_pin');
-  if(saved === PIN) return true;
-  return false;
-}
-  return true;
+function isLogged(){
+  return localStorage.getItem('xsafe_pin') === PIN;
 }
 
-// =========================
-// UNIQUE CODE SHORT
-// =========================
-function uniqueCode(){
-  const chars="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-  let c="";
-  for(let i=0;i<5;i++) c+=chars[Math.floor(Math.random()*chars.length)];
-  return c;
-}
-
-// =========================
-// URL NORMALIZE
-// =========================
+// ================= UTIL =================
 function normalize(url){
   return /^https?:\/\//i.test(url)?url:"https://"+url;
 }
 
-// =========================
-// BOT DETECT
-// =========================
-function isBot(){
-  return /bot|facebook|whatsapp|instagram/i.test(navigator.userAgent);
+function uniqueCode(){
+  return Math.random().toString(36).substring(2,7);
 }
 
-// =========================
-// ARTICLES (LONGER)
-// =========================
-const articles = [];
-for(let i=1;i<=15;i++){
-  articles.push(`<h2>Best Video Downloader & Player Guide ${i}</h2>
-  <img src="https://source.unsplash.com/800x400/?video,media,technology,${i}">
-  <p>Video downloading and playback tools are essential in today's digital environment. Users rely on these tools to save content for offline viewing and enjoy seamless playback across multiple devices without interruption. Modern downloader applications support various formats such as MP4, MKV, and AVI while also allowing users to choose different resolutions including HD and 4K quality. Advanced features like batch downloading, subtitle integration, and high-speed processing make these tools extremely efficient. Meanwhile, video player software continues to evolve by offering smoother playback, hardware acceleration, and customizable interfaces. Choosing the right combination of downloader and player ensures not only performance but also security when accessing online content. As digital media continues to grow, having reliable tools becomes more important for both casual users and professionals.</p>`);
+function copyText(text){
+  navigator.clipboard.writeText(text);
+  alert('Copied');
 }
 
+// ================= ARTICLES =================
 function getArticle(){
-  const imgId = Math.floor(Math.random()*1000);
-  const article = articles[Math.floor(Math.random()*articles.length)];
-
-  // ensure fresh image each load
-  return article.replace(/source\.unsplash\.com\/800x400\/[^\"]+/g, `source.unsplash.com/800x400/?video,media,technology&sig=${imgId}`);
+  const img = `https://source.unsplash.com/800x400/?video,media&sig=${Math.random()}`;
+  return `
+    <h2>Best Video Downloader & Player</h2>
+    <img src="${img}">
+    <p>Video downloading and playback tools are essential today. Users rely on them to save videos and watch offline smoothly. Modern tools support many formats like MP4, MKV, and HD quality. Good players also improve performance with hardware acceleration and subtitle support. Choosing the right software ensures better experience and safety while accessing online media content. These tools continue evolving with faster speed and better compatibility.</p>
+  `;
 }
 
-// =========================
-// GENERATE
-// =========================
+// ================= GENERATE =================
 function generate(){
-  let url=document.getElementById('url').value;
+  let url = document.getElementById('url').value;
   if(!url) return alert('Enter URL');
 
-  url=normalize(url);
+  url = normalize(url);
 
-  let code=uniqueCode();
-  while(localStorage.getItem(code)) code=uniqueCode();
+  let code = uniqueCode();
+  while(localStorage.getItem(code)) code = uniqueCode();
 
-  const short=DOMAIN+location.pathname+'#'+code;
+  const short = DOMAIN + location.pathname + '#' + code;
 
-  localStorage.setItem(code,JSON.stringify({url,clicks:0}));
+  localStorage.setItem(code, JSON.stringify({url,clicks:0}));
 
-  document.getElementById('result').innerHTML=`<div class='item'>${short}<br>
-<button onclick="copyText('${short}')">Copy</button>
-<button onclick="clearResult()">Clear</button>
-</div>`;
-  loadStats();
+  document.getElementById('result').innerHTML = `
+    <div class='item'>${short}<br>
+    <button onclick="copyText('${short}')">Copy</button>
+    <button onclick="document.getElementById('result').innerHTML=''">Clear</button>
+    </div>`;
 }
 
-// =========================
-// BULK
-// =========================
 function bulk(){
-  const list=document.getElementById('bulk').value.split("\n").filter(x=>x.trim());
+  const list = document.getElementById('bulk').value.split("\n").filter(x=>x.trim());
   let html="";
 
   list.forEach(u=>{
-    u=normalize(u);
-    let code=uniqueCode();
-    while(localStorage.getItem(code)) code=uniqueCode();
+    let url = normalize(u);
+    let code = uniqueCode();
+    while(localStorage.getItem(code)) code = uniqueCode();
 
-    const short=DOMAIN+location.pathname+'#'+code;
-    localStorage.setItem(code,JSON.stringify({url,clicks:0}));
+    const short = DOMAIN + location.pathname + '#' + code;
+    localStorage.setItem(code, JSON.stringify({url,clicks:0}));
 
-    html+=`<div class='item'>${short}<br><button onclick="copyText('${short}')">Copy</button></div>`;
+    html += `<div class='item'>${short}<br><button onclick="copyText('${short}')">Copy</button></div>`;
   });
 
-  document.getElementById('bulkResult').innerHTML=html + `<br><button onclick="clearBulk()">Clear All</button>`;
-  loadStats();
+  document.getElementById('bulkResult').innerHTML = html + `<br><button onclick="document.getElementById('bulkResult').innerHTML=''">Clear All</button>`;
 }
 
-// =========================
-// CLEAR FUNCTIONS
-// =========================
-function clearResult(){
-  document.getElementById('result').innerHTML = '';
+// ================= DASHBOARD =================
+function dashboard(){
+  document.getElementById('app').innerHTML = `
+    <div class='container'>
+
+      <div class='card'>
+        <h2>Single Shortlink</h2>
+        <input id='url' placeholder='Enter URL'>
+        <button onclick='generate()'>Generate</button>
+        <div id='result'></div>
+      </div>
+
+      <div class='card'>
+        <h2>Bulk Shortlink</h2>
+        <textarea id='bulk'></textarea>
+        <button onclick='bulk()'>Generate Bulk</button>
+        <div id='bulkResult'></div>
+      </div>
+
+    </div>`;
 }
 
-function clearBulk(){
-  document.getElementById('bulkResult').innerHTML = '';
+// ================= REDIRECT =================
+function redirectPage(data){
+  const delay = Math.floor(Math.random()*3)+8;
+
+  document.getElementById('app').innerHTML = `
+    <div class='container'>
+      <div class='card'>
+        ${getArticle()}
+        <div class='loader'></div>
+        <p id='count'></p>
+        <a href='https://whatsapp.com/channel/0029VbDTbKN4CrfZ5GOmdY0i' target='_blank'>
+          <button>Join WhatsApp</button>
+        </a>
+      </div>
+    </div>`;
+
+  let t = delay;
+  const timer = setInterval(()=>{
+    document.getElementById('count').innerText = "Redirect in " + t;
+    t--;
+    if(t<0){ clearInterval(timer); window.location.href = data.url; }
+  },1000);
 }
 
-// =========================
-// COPY FUNCTION
-// =========================
-function copyText(text){
-  navigator.clipboard.writeText(text).then(()=>{
-    alert('Copied!');
-  }).catch(()=>{
-    prompt('Copy manually:', text);
-  });
-}
-
-// =========================
-// STATS
-// =========================
-function loadStats(){
-  let html="";
-
-  for(let i=0;i<localStorage.length;i++){
-    const key=localStorage.key(i);
-    const data=JSON.parse(localStorage.getItem(key));
-    if(!data || !data.url) continue;
-
-    html+=`<div class='item'>${DOMAIN}${location.pathname}#${key} | Clicks: ${data.clicks}</div>`;
-  }
-
-  document.getElementById('stats').innerHTML=html;
-}
-
-// =========================
-// DASHBOARD
-// =========================
-function dashboard(force=false){
-  if(!checkPin() && !force){
-    renderPinScreen();
-    return;
-  }
-
-  document.getElementById('app').innerHTML=`
-  <div class='container'>
-    <div class='card'>
-      <h2>Single Shortlink</h2>
-      <input id='url' placeholder='Enter URL'>
-      <button onclick='generate()'>Generate</button>
-      <div id='result'></div>
-    </div>
-
-    <div class='card'>
-      <h2>Bulk Shortlink</h2>
-      <textarea id='bulk' placeholder='One URL per line'></textarea>
-      <button onclick='bulk()'>Generate Bulk</button>
-      <div id='bulkResult'></div>
-    </div>
-
-    <div class='card'>
-      <h2>Statistics</h2>
-      <div id='stats'></div>
-    </div>
-  </div>`;
-
-  loadStats();
-}
-
-// =========================
-// REDIRECT
-// =========================
-window.onload=function(){
-  const hash=location.hash.replace('#','');
+// ================= INIT =================
+window.onload = function(){
+  const hash = location.hash.replace('#','');
 
   if(hash){
-    const data=JSON.parse(localStorage.getItem(hash));
-    if(!data) return;
-
-    if(isBot()){
-      document.body.innerHTML="<h2>Welcome</h2>";
-      return;
-    }
-
-    data.clicks++;
-    localStorage.setItem(hash,JSON.stringify(data));
-
-    const delay=Math.floor(Math.random()*3)+8;
-
-    document.body.innerHTML=`
-      <div class='container'>
-        <div class='card'>
-          ${getArticle()}
-          <div class='loader'></div>
-          <p id='count'></p>
-          <a href='https://whatsapp.com/channel/0029VbDTbKN4CrfZ5GOmdY0i' target='_blank'>
-            <button>Join WhatsApp Channel</button>
-          </a>
-        </div>
-      </div>`;
-
-    let t=delay;
-    const timer=setInterval(()=>{
-      document.getElementById('count').innerText="Redirect in "+t+" sec";
-      t--;
-      if(t<0){ clearInterval(timer); window.location.href=data.url; }
-    },1000);
-
+    const data = JSON.parse(localStorage.getItem(hash));
+    if(data) redirectPage(data);
     return;
   }
 
-  dashboard();
+  if(isLogged()){
+    dashboard();
+  } else {
+    showPin();
+  }
 }
 
 </script>
