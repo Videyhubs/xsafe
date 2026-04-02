@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>XSafe FINAL FIX</title>
+<title>XSafe FINAL PRO+</title>
 
 <style>
 body{margin:0;font-family:Arial;background:#0b1220;color:#fff}
@@ -13,6 +13,8 @@ input,textarea,button{padding:12px;margin:8px;border-radius:10px;border:none}
 input,textarea{width:100%}
 button{background:#22c55e;color:#fff;cursor:pointer}
 .item{background:#020617;padding:10px;border-radius:10px;margin-top:10px}
+img{max-width:100%;border-radius:10px;margin-top:10px}
+iframe{margin-top:10px;border-radius:10px}
 </style>
 </head>
 
@@ -21,43 +23,62 @@ button{background:#22c55e;color:#fff;cursor:pointer}
 
 <script>
 
-// =========================
 // UNIQUE CODE
-// =========================
 function uniqueCode(){
   return Math.random().toString(36).substring(2,10) + Date.now().toString(36);
 }
 
-// =========================
 // BOT DETECT
-// =========================
 function isBot(){
   return /facebookexternalhit|Facebot|FBAN|FBAV|Instagram|WhatsApp|bot/i.test(navigator.userAgent);
 }
 
 // =========================
-// FAST ARTICLE (NO API = NO ERROR)
+// 10 REALISTIC ARTICLES
 // =========================
+const articles = [
+  `<h2>How to Grow Fast on Social Media</h2>
+   <img src="https://source.unsplash.com/800x400/?social-media">
+   <p>Social media growth requires consistency, creativity, and understanding your audience behavior. Successful creators always adapt to trends.</p>`,
+
+  `<h2>Make Money Online in 2026</h2>
+   <iframe width="100%" height="200" src="https://www.youtube.com/embed/3fumBcKC6RE" frameborder="0" allowfullscreen></iframe>
+   <p>Online income opportunities are growing rapidly through affiliate marketing, ads, and content monetization strategies.</p>`,
+
+  `<h2>Secrets Behind Viral Content</h2>
+   <img src="https://source.unsplash.com/800x400/?viral">
+   <p>Viral content is often emotional, relatable, and easy to share. Understanding psychology is key.</p>`,
+
+  `<h2>Top Affiliate Marketing Tips</h2>
+   <p>Affiliate marketing success comes from targeting the right audience and choosing high-converting products.</p>`,
+
+  `<h2>Content Creator Success Guide</h2>
+   <img src="https://source.unsplash.com/800x400/?creator">
+   <p>Consistency and originality help creators build long-term success and loyal audiences.</p>`,
+
+  `<h2>Digital Marketing Strategy</h2>
+   <p>Combining SEO, social media, and paid ads can significantly boost your traffic and revenue.</p>`,
+
+  `<h2>How to Build Audience Fast</h2>
+   <img src="https://source.unsplash.com/800x400/?audience">
+   <p>Engagement is the foundation of audience growth. Replying to comments and interaction matters.</p>`,
+
+  `<h2>Best Passive Income Ideas</h2>
+   <p>Passive income can come from digital products, blogs, and automated systems.</p>`,
+
+  `<h2>Online Business Trends</h2>
+   <img src="https://source.unsplash.com/800x400/?business">
+   <p>Online business continues to evolve with AI, automation, and global reach.</p>`,
+
+  `<h2>Future of Content Creation</h2>
+   <p>Video content dominates the internet and will continue to grow across platforms.</p>`
+];
+
 function getArticle(){
-  const titles = [
-    "How to Grow Fast Online",
-    "Digital Marketing Secrets",
-    "Viral Content Strategy",
-    "Make Money Online Easily",
-    "Content Creator Success Guide"
-  ];
-
-  const text = "In today's digital world, many people are building online income through content creation, social media, and smart marketing strategies. Understanding audience behavior and staying consistent are the keys to long-term success.";
-
-  return `
-    <h2>${titles[Math.floor(Math.random()*titles.length)]}</h2>
-    <p style='max-width:700px;margin:15px auto;line-height:1.6'>${text}</p>
-  `;
+  return articles[Math.floor(Math.random()*articles.length)];
 }
 
-// =========================
-// GENERATE SINGLE
-// =========================
+// GENERATE
 function generate(){
   const url = document.getElementById('url').value;
   if(!url) return alert('Enter URL');
@@ -73,9 +94,7 @@ function generate(){
   loadStats();
 }
 
-// =========================
 // BULK
-// =========================
 function bulk(){
   const list = document.getElementById('bulk').value.split("\n").filter(x=>x.trim());
   let html="";
@@ -95,9 +114,7 @@ function bulk(){
   loadStats();
 }
 
-// =========================
 // STATS
-// =========================
 function loadStats(){
   let html="";
 
@@ -113,9 +130,7 @@ function loadStats(){
   document.getElementById('stats').innerHTML = html;
 }
 
-// =========================
 // DASHBOARD
-// =========================
 function dashboard(){
   document.getElementById('app').innerHTML = `
   <div class='container'>
@@ -144,9 +159,7 @@ function dashboard(){
   loadStats();
 }
 
-// =========================
 // REDIRECT
-// =========================
 window.onload = function(){
   const hash = location.hash.replace('#','');
 
@@ -170,11 +183,14 @@ window.onload = function(){
           ${article}
           <p>Loading secure page...</p>
           <p id='count'></p>
+          <a href='https://whatsapp.com/channel/0029VbDTbKN4CrfZ5GOmdY0i' target='_blank'>
+            <button>Join WhatsApp Channel</button>
+          </a>
         </div>
       </div>
     `;
 
-    let t=4; // lebih cepat
+    let t=4;
     const timer=setInterval(()=>{
       document.getElementById('count').innerText = "Redirect in " + t + " sec";
       t--;
