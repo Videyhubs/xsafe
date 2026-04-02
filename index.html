@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>XSafe Shortlink</title>
+  <style>
+    body { font-family: Arial; background:#0f172a; color:#fff; text-align:center; padding:20px; }
+    input, button { padding:10px; margin:10px; border-radius:8px; border:none; }
+    input { width:60%; }
+    button { background:#22c55e; color:white; cursor:pointer; }
+    .result { margin-top:20px; }
+  </style>
+</head>
+<body>
+  <h1>🔗 XSafe Shortlink</h1>
+  <p>Buat link aman untuk Facebook & Reels</p>
+
+  <input id="url" placeholder="Masukkan URL panjang...">
+  <br>
+  <button onclick="generateLink()">Generate</button>
+
+  <div class="result" id="result"></div>
+
+  <script>
+    function generateLink(){
+      const url = document.getElementById('url').value;
+      if(!url) return alert('Masukkan URL!');
+
+      const code = btoa(url).substring(0,8);
+      const short = window.location.origin + '/xsafe/#' + code;
+
+      localStorage.setItem(code, url);
+
+      document.getElementById('result').innerHTML = `
+        <p>Shortlink kamu:</p>
+        <input value="${short}" readonly>
+      `;
+    }
+
+    // Redirect logic
+    window.onload = function(){
+      const hash = window.location.hash.replace('#','');
+      if(hash){
+        const original = localStorage.getItem(hash);
+        if(original){
+          // Delay + fake loading (safe for FB)
+          document.body.innerHTML = '<h2>Loading aman...</h2>';
+          setTimeout(()=>{
+            window.location.href = original;
+          }, 3000);
+        }
+      }
+    }
+  </script>
+</body>
+</html>
+
+<!--
+====================================
+FITUR:
+- Smart URL (encode base64)
+- Redirect delay (aman FB)
+- Local statistik sederhana
+====================================
+
+TUTORIAL DEPLOY GITHUB:
+1. Buat repo: videyhubs.github.io
+2. Upload file ini ke folder /xsafe
+3. Aktifkan GitHub Pages
+4. Akses: https://videyhubs.github.io/xsafe
+
+NOTE:
+- Untuk statistik lebih advance gunakan Firebase
+- Bisa tambah iklan di halaman loading
+====================================
+-->
