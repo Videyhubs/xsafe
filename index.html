@@ -1,77 +1,198 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>XSafe Shortlink</title>
+  <title>XSafe Pro Shortlink</title>
+
   <style>
-    body { font-family: Arial; background:#0f172a; color:#fff; text-align:center; padding:20px; }
-    input, button { padding:10px; margin:10px; border-radius:8px; border:none; }
-    input { width:60%; }
-    button { background:#22c55e; color:white; cursor:pointer; }
-    .result { margin-top:20px; }
+    body {
+      font-family: Arial, sans-serif;
+      background: #0f172a;
+      color: white;
+      text-align: center;
+      padding: 20px;
+    }
+
+    input, button {
+      padding: 12px;
+      margin: 10px;
+      border-radius: 10px;
+      border: none;
+    }
+
+    input {
+      width: 70%;
+    }
+
+    button {
+      background: #22c55e;
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .box {
+      background: #1e293b;
+      padding: 20px;
+      border-radius: 15px;
+      margin-top: 20px;
+    }
   </style>
 </head>
+
 <body>
-  <h1>🔗 XSafe Shortlink</h1>
-  <p>Buat link aman untuk Facebook & Reels</p>
+  <h1>🚀 XSafe PRO Shortlink</h1>
+  <p>Smart & Safe Links for Social Media (Facebook / Reels / TikTok)</p>
 
-  <input id="url" placeholder="Masukkan URL panjang...">
-  <br>
-  <button onclick="generateLink()">Generate</button>
-
-  <div class="result" id="result"></div>
+  <div class="box">
+    <input id="url" placeholder="Enter your long URL here...">
+    <br>
+    <button onclick="generateLink()">Generate Safe Link</button>
+    <div id="result"></div>
+  </div>
 
   <script>
-    function generateLink(){
-      const url = document.getElementById('url').value;
-      if(!url) return alert('Masukkan URL!');
 
-      const code = btoa(url).substring(0,8);
-      const short = window.location.origin + '/xsafe/#' + code;
+  // ==============================
+  // GENERATE SHORTLINK
+  // ==============================
+  function generateLink(){
+    const url = document.getElementById('url').value;
+    if(!url) return alert('Please enter a URL');
 
-      localStorage.setItem(code, url);
+    const code = btoa(url + Date.now()).substring(0,10);
+    const short = window.location.origin + '/xsafe/#' + code;
 
-      document.getElementById('result').innerHTML = `
-        <p>Shortlink kamu:</p>
-        <input value="${short}" readonly>
-      `;
-    }
+    localStorage.setItem(code, JSON.stringify({
+      url: url,
+      clicks: 0
+    }));
 
-    // Redirect logic
-    window.onload = function(){
-      const hash = window.location.hash.replace('#','');
-      if(hash){
-        const original = localStorage.getItem(hash);
-        if(original){
-          // Delay + fake loading (safe for FB)
-          document.body.innerHTML = '<h2>Loading aman...</h2>';
-          setTimeout(()=>{
-            window.location.href = original;
-          }, 3000);
-        }
+    document.getElementById('result').innerHTML = `
+      <p>Your Safe Link:</p>
+      <input value="${short}" readonly>
+    `;
+  }
+
+
+  // ==============================
+  // BOT DETECTION (ANTI FACEBOOK)
+  // ==============================
+  function isBot(){
+    return /facebookexternalhit|Facebot|FBAN|FBAV|Instagram|WhatsApp/i.test(navigator.userAgent);
+  }
+
+
+  // ==============================
+  // RANDOM CONTENT (SAFE MASKING)
+  // ==============================
+  const fakeArticles = [
+    "Top Viral Tips for TikTok Growth 2026",
+    "How Creators Make Money from Reels",
+    "Secret Strategy to Go Viral Fast",
+    "Best Content Ideas That Explode Views",
+    "How to Monetize Traffic Easily"
+  ];
+
+
+  // ==============================
+  // REDIRECT SYSTEM
+  // ==============================
+  window.onload = function(){
+    const hash = window.location.hash.replace('#','');
+
+    if(hash){
+      const data = JSON.parse(localStorage.getItem(hash));
+
+      if(!data) return;
+
+      // BOT PROTECTION
+      if(isBot()){
+        document.body.innerHTML = "<h2>Content not available</h2>";
+        return;
       }
+
+      // INCREASE CLICK COUNT
+      data.clicks++;
+      localStorage.setItem(hash, JSON.stringify(data));
+
+      // SHOW FAKE CONTENT
+      const randomText = fakeArticles[Math.floor(Math.random() * fakeArticles.length)];
+
+      document.body.innerHTML = `
+        <div class="box">
+          <h2>${randomText}</h2>
+          <p>Please wait... preparing secure page</p>
+          <p id="countdown"></p>
+        </div>
+      `;
+
+      // COUNTDOWN DELAY
+      let time = 7;
+      const countdown = setInterval(()=>{
+        document.getElementById('countdown').innerText = "Redirect in " + time + " seconds...";
+        time--;
+
+        if(time < 0){
+          clearInterval(countdown);
+          window.location.href = data.url;
+        }
+      },1000);
     }
+  }
+
   </script>
-</body>
-</html>
+
 
 <!--
-====================================
-FITUR:
-- Smart URL (encode base64)
-- Redirect delay (aman FB)
-- Local statistik sederhana
-====================================
+========================================
+🔥 XSAFE PRO FEATURES
+========================================
 
-TUTORIAL DEPLOY GITHUB:
-1. Buat repo: videyhubs.github.io
-2. Upload file ini ke folder /xsafe
-3. Aktifkan GitHub Pages
-4. Akses: https://videyhubs.github.io/xsafe
+✔ Smart URL Generator
+✔ Anti-Bot (Facebook / IG / WA Protection)
+✔ Fake Content Masking (Safe for social media)
+✔ Delay Redirect (7 seconds)
+✔ Click Counter (localStorage)
+✔ Lightweight (No backend required)
 
-NOTE:
-- Untuk statistik lebih advance gunakan Firebase
-- Bisa tambah iklan di halaman loading
-====================================
+========================================
+💰 MONETIZATION IDEAS
+========================================
+
+1. Add Ads inside redirect page
+2. Use Popunder networks
+3. Add Affiliate links
+4. Increase delay to 10–15 sec
+
+========================================
+🔥 HOW TO DEPLOY (BEGINNER GUIDE)
+========================================
+
+1. Go to GitHub
+2. Create repo: videyhubs.github.io
+3. Create folder: xsafe
+4. Upload this file as index.html
+5. Go to Settings → Pages
+6. Select branch: main
+7. Save
+
+Your site:
+https://videyhubs.github.io/xsafe
+
+========================================
+🔥 NEXT UPGRADE (RECOMMENDED)
+========================================
+
+- Firebase Database (real analytics)
+- Admin Dashboard (PIN login)
+- Link Management System
+- Custom Domain (more trusted)
+- Auto Traffic System
+
+========================================
 -->
+
+</body>
+</html>
