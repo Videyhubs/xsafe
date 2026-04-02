@@ -3,68 +3,56 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>XSafe Shortlink</title>
+<title>XSafe FINAL FIX</title>
 
 <style>
 body{margin:0;font-family:Arial;background:#0b1220;color:#fff}
-header{padding:15px;text-align:center;background:#020617}
-.container{max-width:1100px;margin:auto;padding:20px}
-.card{background:#111827;padding:20px;border-radius:15px;margin-top:20px}
+.container{max-width:900px;margin:auto;padding:20px}
+.card{background:#111827;padding:20px;border-radius:15px;margin-top:20px;text-align:center}
 input,textarea,button{padding:12px;margin:8px;border-radius:10px;border:none}
 input,textarea{width:100%}
 button{background:#22c55e;color:#fff;cursor:pointer}
 .item{background:#020617;padding:10px;border-radius:10px;margin-top:10px}
-.center{text-align:center}
 </style>
 </head>
 
 <body>
-
-<header>
-<h1>🚀 XSafe FINAL SYSTEM</h1>
-</header>
-
 <div id="app"></div>
 
 <script>
 
 // =========================
-// UNIQUE CODE (STRONG)
+// UNIQUE CODE
 // =========================
 function uniqueCode(){
-  const arr = new Uint8Array(12);
-  crypto.getRandomValues(arr);
-  return Array.from(arr).map(b=>b.toString(16).padStart(2,'0')).join('').slice(0,12);
+  return Math.random().toString(36).substring(2,10) + Date.now().toString(36);
 }
 
 // =========================
-// BOT DETECT (CLOAKING)
+// BOT DETECT
 // =========================
 function isBot(){
-  return /facebookexternalhit|Facebot|FBAN|FBAV|Instagram|WhatsApp|bot|crawl/i.test(navigator.userAgent);
+  return /facebookexternalhit|Facebot|FBAN|FBAV|Instagram|WhatsApp|bot/i.test(navigator.userAgent);
 }
 
 // =========================
-// REAL ARTICLE + FALLBACK
+// FAST ARTICLE (NO API = NO ERROR)
 // =========================
-async function getArticle(){
-  try{
-    const res = await fetch('https://api.allorigins.win/raw?url=https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml');
-    const text = await res.text();
-    const xml = new DOMParser().parseFromString(text,'text/xml');
-    const items = xml.querySelectorAll('item');
+function getArticle(){
+  const titles = [
+    "How to Grow Fast Online",
+    "Digital Marketing Secrets",
+    "Viral Content Strategy",
+    "Make Money Online Easily",
+    "Content Creator Success Guide"
+  ];
 
-    if(items.length === 0) throw 'no data';
+  const text = "In today's digital world, many people are building online income through content creation, social media, and smart marketing strategies. Understanding audience behavior and staying consistent are the keys to long-term success.";
 
-    const rand = items[Math.floor(Math.random()*items.length)];
-    const title = rand.querySelector('title').textContent;
-    const desc = rand.querySelector('description').textContent;
-
-    return `<h2>${title}</h2><p>${desc}</p>`;
-
-  }catch{
-    return `<h2>Digital Content Growth</h2><p>Content creation is rapidly evolving and many creators are finding new ways to monetize their audience using modern strategies.</p>`;
-  }
+  return `
+    <h2>${titles[Math.floor(Math.random()*titles.length)]}</h2>
+    <p style='max-width:700px;margin:15px auto;line-height:1.6'>${text}</p>
+  `;
 }
 
 // =========================
@@ -86,7 +74,7 @@ function generate(){
 }
 
 // =========================
-// BULK GENERATE
+// BULK
 // =========================
 function bulk(){
   const list = document.getElementById('bulk').value.split("\n").filter(x=>x.trim());
@@ -126,7 +114,7 @@ function loadStats(){
 }
 
 // =========================
-// DASHBOARD UI
+// DASHBOARD
 // =========================
 function dashboard(){
   document.getElementById('app').innerHTML = `
@@ -157,9 +145,9 @@ function dashboard(){
 }
 
 // =========================
-// REDIRECT SYSTEM
+// REDIRECT
 // =========================
-window.onload = async function(){
+window.onload = function(){
   const hash = location.hash.replace('#','');
 
   if(hash){
@@ -174,10 +162,10 @@ window.onload = async function(){
     data.clicks++;
     localStorage.setItem(hash, JSON.stringify(data));
 
-    const article = await getArticle();
+    const article = getArticle();
 
     document.body.innerHTML = `
-      <div class='container center'>
+      <div class='container'>
         <div class='card'>
           ${article}
           <p>Loading secure page...</p>
@@ -186,7 +174,7 @@ window.onload = async function(){
       </div>
     `;
 
-    let t=7;
+    let t=4; // lebih cepat
     const timer=setInterval(()=>{
       document.getElementById('count').innerText = "Redirect in " + t + " sec";
       t--;
@@ -204,6 +192,5 @@ window.onload = async function(){
 }
 
 </script>
-
 </body>
 </html>
