@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>XSafe Stable Version</title>
+<title>XSafe Ultimate Version</title>
 
 <style>
 body{margin:0;font-family:Arial;background:#0b1220;color:#fff}
@@ -14,8 +14,17 @@ input,textarea{width:100%}
 button{background:#22c55e;color:#fff;cursor:pointer}
 .item{background:#020617;padding:10px;border-radius:10px;margin-top:10px;word-break:break-all}
 img{max-width:100%;border-radius:10px;margin-top:10px}
-.loader{border:5px solid #1f2937;border-top:5px solid #22c55e;border-radius:50%;width:50px;height:50px;animation:spin 1s linear infinite;margin:20px auto}
+
+/* LOADER ANIMATION */
+.loader{
+  width:60px;height:60px;margin:20px auto;
+  border-radius:50%;
+  border:6px solid #1f2937;
+  border-top:6px solid #22c55e;
+  animation:spin 0.8s linear infinite, pulse 1.5s ease-in-out infinite;
+}
 @keyframes spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
+@keyframes pulse{0%,100%{box-shadow:0 0 10px #22c55e}50%{box-shadow:0 0 25px #22c55e}}
 </style>
 </head>
 
@@ -24,6 +33,20 @@ img{max-width:100%;border-radius:10px;margin-top:10px}
 
 <script>
 
+// =========================
+// ANTI COPY / DEVTOOLS
+// =========================
+document.addEventListener('contextmenu', e => e.preventDefault());
+document.addEventListener('copy', e => e.preventDefault());
+document.addEventListener('keydown', function(e){
+  if(e.key === 'F12' || (e.ctrlKey && e.shiftKey && ['I','J','C'].includes(e.key))){
+    e.preventDefault();
+  }
+});
+
+// =========================
+// CONFIG
+// =========================
 const DOMAIN = "https://www.xsafe.biz.id";
 const PIN = "270491";
 
@@ -36,35 +59,47 @@ function checkPin(){
   return true;
 }
 
+// =========================
+// UNIQUE CODE SHORT
+// =========================
 function uniqueCode(){
   const chars="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
   let c="";
-  for(let i=0;i<6;i++) c+=chars[Math.floor(Math.random()*chars.length)];
+  for(let i=0;i<5;i++) c+=chars[Math.floor(Math.random()*chars.length)];
   return c;
 }
 
+// =========================
+// URL NORMALIZE
+// =========================
 function normalize(url){
   return /^https?:\/\//i.test(url)?url:"https://"+url;
 }
 
+// =========================
+// BOT DETECT
+// =========================
 function isBot(){
   return /bot|facebook|whatsapp|instagram/i.test(navigator.userAgent);
 }
 
-}
-
-// ARTICLES
+// =========================
+// ARTICLES (LONGER)
+// =========================
 const articles = [];
-for(let i=1;i<=10;i++){
-  articles.push(`<h2>Video Downloader & Player Guide ${i}</h2>
-  <img src="https://source.unsplash.com/800x400/?video,technology,${i}">
-  <p>Video downloading and playback tools are essential in today's digital environment. Users rely on these tools to save content for offline viewing and enjoy seamless playback across devices. Modern applications support multiple formats and offer high-definition quality, ensuring the best experience. Features like subtitle support, batch downloads, and fast processing make them highly efficient. Choosing a reliable tool ensures both performance and security while accessing online media content efficiently without interruptions.</p>`);
+for(let i=1;i<=15;i++){
+  articles.push(`<h2>Best Video Downloader & Player Guide ${i}</h2>
+  <img src="https://source.unsplash.com/800x400/?video,media,technology,${i}">
+  <p>Video downloading and playback tools are essential in today's digital environment. Users rely on these tools to save content for offline viewing and enjoy seamless playback across multiple devices without interruption. Modern downloader applications support various formats such as MP4, MKV, and AVI while also allowing users to choose different resolutions including HD and 4K quality. Advanced features like batch downloading, subtitle integration, and high-speed processing make these tools extremely efficient. Meanwhile, video player software continues to evolve by offering smoother playback, hardware acceleration, and customizable interfaces. Choosing the right combination of downloader and player ensures not only performance but also security when accessing online content. As digital media continues to grow, having reliable tools becomes more important for both casual users and professionals.</p>`);
 }
 
 function getArticle(){
   return articles[Math.floor(Math.random()*articles.length)];
 }
 
+// =========================
+// GENERATE
+// =========================
 function generate(){
   let url=document.getElementById('url').value;
   if(!url) return alert('Enter URL');
@@ -82,6 +117,9 @@ function generate(){
   loadStats();
 }
 
+// =========================
+// BULK
+// =========================
 function bulk(){
   const list=document.getElementById('bulk').value.split("\n").filter(x=>x.trim());
   let html="";
@@ -101,6 +139,9 @@ function bulk(){
   loadStats();
 }
 
+// =========================
+// STATS
+// =========================
 function loadStats(){
   let html="";
 
@@ -115,6 +156,9 @@ function loadStats(){
   document.getElementById('stats').innerHTML=html;
 }
 
+// =========================
+// DASHBOARD
+// =========================
 function dashboard(){
   if(!checkPin()) return;
 
@@ -143,8 +187,10 @@ function dashboard(){
   loadStats();
 }
 
+// =========================
+// REDIRECT
+// =========================
 window.onload=function(){
-  
 
   const hash=location.hash.replace('#','');
 
