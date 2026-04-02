@@ -13,8 +13,14 @@ input,textarea,button{padding:12px;margin:8px;border-radius:10px;border:none}
 input,textarea{width:100%}
 button{background:#22c55e;color:#fff;cursor:pointer}
 .item{background:#020617;padding:10px;border-radius:10px;margin-top:10px;word-break:break-all}
-.loader{width:60px;height:60px;margin:20px auto;border-radius:50%;border:6px solid #1f2937;border-top:6px solid #22c55e;animation:spin 1s linear infinite}
+img{max-width:100%;border-radius:10px;margin-top:10px}
+
+/* LOADER ANIMATION */
+.loader{margin:20px auto;width:70px;height:70px;border-radius:50%;border:6px solid #1f2937;border-top:6px solid #22c55e;animation:spin 1s linear infinite}
 @keyframes spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
+
+.pulse{animation:pulse 1.5s infinite}
+@keyframes pulse{0%{opacity:0.4}50%{opacity:1}100%{opacity:0.4}}
 </style>
 </head>
 
@@ -23,11 +29,24 @@ button{background:#22c55e;color:#fff;cursor:pointer}
 
 <script>
 
+// ================= SECURITY =================
+document.addEventListener('contextmenu',e=>e.preventDefault());
+document.addEventListener('copy',e=>e.preventDefault());
+document.addEventListener('cut',e=>e.preventDefault());
+document.addEventListener('keydown',function(e){
+  if(e.ctrlKey && ['u','c','x','s'].includes(e.key.toLowerCase())) e.preventDefault();
+});
+
+// BLOCK IE
+if(navigator.userAgent.indexOf("MSIE")!==-1 || !!document.documentMode){
+  document.body.innerHTML = "<h2 style='text-align:center'>Browser Not Supported</h2>";
+}
+
 // ================= CONFIG =================
 const PIN = "270491";
 const DOMAIN = "https://xsafe.biz.id";
 
-// ================= PIN UI =================
+// ================= PIN =================
 function showPin(){
   document.getElementById('app').innerHTML = `
     <div class='container'>
@@ -44,9 +63,7 @@ function loginPin(){
   if(val === PIN){
     localStorage.setItem('xsafe_pin', PIN);
     dashboard();
-  } else {
-    alert('Wrong PIN');
-  }
+  } else alert('Wrong PIN');
 }
 
 function isLogged(){
@@ -59,7 +76,7 @@ function normalize(url){
 }
 
 function uniqueCode(){
-  return Math.random().toString(36).substring(2,7);
+  return Math.random().toString(36).substring(2,6);
 }
 
 function copyText(text){
@@ -68,13 +85,18 @@ function copyText(text){
 }
 
 // ================= ARTICLES =================
-function getArticle(){
-  const img = `https://source.unsplash.com/800x400/?video,media&sig=${Math.random()}`;
+const articles = Array.from({length:10}).map((_,i)=>{
+  const img = `https://source.unsplash.com/800x400/?video,player,software&sig=${Math.random()}`;
   return `
-    <h2>Best Video Downloader & Player</h2>
-    <img src="${img}">
-    <p>Video downloading and playback tools are essential today. Users rely on them to save videos and watch offline smoothly. Modern tools support many formats like MP4, MKV, and HD quality. Good players also improve performance with hardware acceleration and subtitle support. Choosing the right software ensures better experience and safety while accessing online media content. These tools continue evolving with faster speed and better compatibility.</p>
-  `;
+  <h2>Top Video Downloader & Player Tool #${i+1}</h2>
+  <img src="${img}">
+  <p>
+  Video downloading and playback software has become essential for users who want flexibility in consuming digital content. These tools allow users to download videos from various platforms and store them locally for offline viewing. Modern applications support multiple formats such as MP4, AVI, and MKV, along with HD and 4K quality options. In addition to downloading, video players now come equipped with powerful features like subtitle synchronization, playback speed control, and hardware acceleration. These features enhance the viewing experience and ensure smooth performance even on lower-end devices. Many users also prioritize security and prefer tools that are free from malware or intrusive ads. Choosing the right combination of downloader and player software can significantly improve productivity and entertainment. As technology evolves, these tools continue to become faster, safer, and more efficient for everyday use.
+  </p>`;
+});
+
+function getArticle(){
+  return articles[Math.floor(Math.random()*articles.length)];
 }
 
 // ================= GENERATE =================
@@ -147,7 +169,7 @@ function redirectPage(data){
       <div class='card'>
         ${getArticle()}
         <div class='loader'></div>
-        <p id='count'></p>
+        <p id='count' class='pulse'></p>
         <a href='https://whatsapp.com/channel/0029VbDTbKN4CrfZ5GOmdY0i' target='_blank'>
           <button>Join WhatsApp</button>
         </a>
@@ -156,7 +178,7 @@ function redirectPage(data){
 
   let t = delay;
   const timer = setInterval(()=>{
-    document.getElementById('count').innerText = "Redirect in " + t;
+    document.getElementById('count').innerText = "Redirect in " + t + " sec";
     t--;
     if(t<0){ clearInterval(timer); window.location.href = data.url; }
   },1000);
@@ -172,11 +194,7 @@ window.onload = function(){
     return;
   }
 
-  if(isLogged()){
-    dashboard();
-  } else {
-    showPin();
-  }
+  if(isLogged()) dashboard(); else showPin();
 }
 
 </script>
