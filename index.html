@@ -52,14 +52,30 @@ setInterval(()=>{
 
 // ANTI ADBLOCK (simple detect)
 function antiAdblock(){
-  const bait=document.createElement('div');
-  bait.className='adsbox';
-  document.body.appendChild(bait);
-  setTimeout(()=>{
-    if(bait.offsetHeight===0){
-      alert('Disable Adblock to continue');
-      location.reload();
-    }
+  try{
+    const bait=document.createElement('div');
+    bait.className='adsbox pub_300x250 ads ad-banner ad-unit';
+    bait.style.position='absolute';
+    bait.style.left='-999px';
+    bait.style.height='1px';
+    document.body.appendChild(bait);
+
+    setTimeout(()=>{
+      const blocked = bait.offsetHeight === 0 || bait.clientHeight === 0;
+
+      // hanya trigger kalau benar-benar terdeteksi kuat
+      if(blocked && navigator.userAgent.toLowerCase().includes('chrome')){
+        console.warn('Adblock detected');
+        // jangan reload paksa (biar tidak false positive)
+      }
+
+      bait.remove();
+    },300);
+
+  }catch(e){
+    console.log('Adblock check skipped');
+  }
+}
     bait.remove();
   },100);
 }
