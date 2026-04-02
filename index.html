@@ -3,12 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>XSafe Short</title>
+<title>XSafe Shortlik</title>
 
 <style>
 body{margin:0;font-family:Arial;background:#0b1220;color:#fff}
-.container{max-width:900px;margin:auto;padding:20px}
-.card{background:#111827;padding:20px;border-radius:20px;margin-top:20px;text-align:center}
+.container{max-width:1000px;margin:auto;padding:20px}
+.card{background:#111827;padding:20px;border-radius:20px;margin-top:20px}
+input,textarea,button{padding:12px;margin:8px;border-radius:10px;border:none}
+input,textarea{width:100%}
+button{background:#22c55e;color:#fff;cursor:pointer}
+.item{background:#020617;padding:10px;border-radius:10px;margin-top:10px}
 </style>
 </head>
 
@@ -25,86 +29,167 @@ function isBot(){
 }
 
 // ==============================
-// REAL ARTICLE API (FREE SOURCE)
+// UNIQUE CODE
+// ==============================
+function uniqueCode(){
+  const arr = new Uint8Array(12);
+  crypto.getRandomValues(arr);
+  return Array.from(arr).map(b=>b.toString(16).padStart(2,'0')).join('').slice(0,14);
+}
+
+// ==============================
+// REAL ARTICLE API
 // ==============================
 async function fetchArticle(){
   try{
     const res = await fetch('https://api.allorigins.win/raw?url=https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml');
     const text = await res.text();
-
     const parser = new DOMParser();
     const xml = parser.parseFromString(text, "text/xml");
     const items = xml.querySelectorAll("item");
-
     const random = items[Math.floor(Math.random()*items.length)];
-
-    const title = random.querySelector("title")?.textContent || "Latest News";
-    const desc = random.querySelector("description")?.textContent || "";
-
-    return `
-      <h2>${title}</h2>
-      <p style="max-width:700px;margin:auto;line-height:1.6">${desc}</p>
-    `;
-
-  }catch(e){
-    return `<h2>Loading content...</h2><p>Preparing article...</p>`;
+    const title = random.querySelector("title")?.textContent;
+    const desc = random.querySelector("description")?.textContent;
+    return `<h2 style='text-align:center'>${title}</h2><p style='max-width:700px;margin:auto'>${desc}</p>`;
+  }catch{
+    return `<h2>Loading article...</h2>`;
   }
 }
 
+// ==============================
+// GENERATE SINGLE
+// ==============================
+function generateOne(){
+  const url = document.getElementById('url').value;
+  if(!url) return alert('Enter URL');
+
+  let code = uniqueCode();
+  while(localStorage.getItem(code)) code = uniqueCode();
+
+  const short = location.origin + '/xsafe/#' + code;
+
+  localStorage.setItem(code, JSON.stringify({url,clicks:0}));
+
+  document.getElementById('result').innerHTML = `<div class='item'>${short}</div>`;
+  loadStats();
+}
 
 // ==============================
-// REDIRECT SYSTEM (CLOAK MODE)
+// BULK GENERATE
+// ==============================
+function generateBulk(){
+  const lines = document.getElementById('bulk').value.split("\n").filter(x=>x.trim());
+  let html="";
+
+  lines.forEach(url=>{
+    let code = uniqueCode();
+    while(localStorage.getItem(code)) code = uniqueCode();
+
+    const short = location.origin + '/xsafe/#' + code;
+
+    localStorage.setItem(code, JSON.stringify({url,clicks:0}));
+
+    html += `<div class='item'>${short}</div>`;
+  });
+
+  document.getElementById('bulkResult').innerHTML = html;
+  loadStats();
+}
+
+// ==============================
+// STATS
+// ==============================
+function loadStats(){
+  let html="";
+
+  for(let i=0;i<localStorage.length;i++){
+    const key = localStorage.key(i);
+    const data = JSON.parse(localStorage.getItem(key));
+
+    if(!data || !data.url) continue;
+
+    html += `<div class='item'>${location.origin}/xsafe/#${key} | Clicks: ${data.clicks}</div>`;
+  }
+
+  document.getElementById('stats').innerHTML = html;
+}
+
+// ==============================
+// DASHBOARD
+// ==============================
+function dashboard(){
+  document.getElementById('app').innerHTML = `
+    <div class='container'>
+
+      <div class='card'>
+        <h2>Single Shortlink</h2>
+        <input id='url' placeholder='Enter URL'>
+        <button onclick='generateOne()'>Generate</button>
+        <div id='result'></div>
+      </div>
+
+      <div class='card'>
+        <h2>Bulk Shortlink</h2>
+        <textarea id='bulk' placeholder='One URL per line'></textarea>
+        <button onclick='generateBulk()'>Generate Bulk</button>
+        <div id='bulkResult'></div>
+      </div>
+
+      <div class='card'>
+        <h2>Statistics</h2>
+        <div id='stats'></div>
+      </div>
+
+    </div>
+  `;
+
+  loadStats();
+}
+
+// ==============================
+// REDIRECT MODE
 // ==============================
 window.onload = async function(){
-
   const hash = location.hash.replace('#','');
 
   if(hash){
     const data = JSON.parse(localStorage.getItem(hash));
     if(!data) return;
 
-    // BOT = show safe page only
     if(isBot()){
-      document.body.innerHTML = "<h2>Welcome to our website</h2>";
+      document.body.innerHTML = "<h2>Welcome</h2>";
       return;
     }
 
-    // REAL USER = show article
+    data.clicks++;
+    localStorage.setItem(hash, JSON.stringify(data));
+
     const article = await fetchArticle();
 
     document.body.innerHTML = `
-      <div class="container">
-        <div class="card">
+      <div class='container'>
+        <div class='card'>
           ${article}
-          <p>Loading secure page...</p>
-          <p id="count"></p>
+          <p style='text-align:center'>Loading secure page...</p>
+          <p id='count' style='text-align:center'></p>
         </div>
       </div>
     `;
 
-    let t = 8;
-    const timer = setInterval(()=>{
+    let t=8;
+    const timer=setInterval(()=>{
       document.getElementById('count').innerText = "Redirect in " + t + " sec";
       t--;
-
-      if(t < 0){
+      if(t<0){
         clearInterval(timer);
-        window.location.href = data.url;
+        location.href=data.url;
       }
     },1000);
 
     return;
   }
 
-  // DEFAULT PAGE
-  document.getElementById('app').innerHTML = `
-    <div class="container">
-      <div class="card">
-        <h2>XSafe GOD MODE ACTIVE</h2>
-        <p>Your cloaking + real article system is running.</p>
-      </div>
-    </div>
-  `;
+  dashboard();
 }
 
 </script>
