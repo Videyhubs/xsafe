@@ -113,7 +113,7 @@ function generate(){
 
   localStorage.setItem(code,JSON.stringify({url,clicks:0}));
 
-  document.getElementById('result').innerHTML=`<div class='item'>${short}</div>`;
+  document.getElementById('result').innerHTML=`<div class='item'>${short}<br><button onclick="copyText('${short}')">Copy</button></div>`;
   loadStats();
 }
 
@@ -132,11 +132,22 @@ function bulk(){
     const short=DOMAIN+location.pathname+'#'+code;
     localStorage.setItem(code,JSON.stringify({url,clicks:0}));
 
-    html+=`<div class='item'>${short}</div>`;
+    html+=`<div class='item'>${short}<br><button onclick="copyText('${short}')">Copy</button></div>`;
   });
 
   document.getElementById('bulkResult').innerHTML=html;
   loadStats();
+}
+
+// =========================
+// COPY FUNCTION
+// =========================
+function copyText(text){
+  navigator.clipboard.writeText(text).then(()=>{
+    alert('Copied!');
+  }).catch(()=>{
+    prompt('Copy manually:', text);
+  });
 }
 
 // =========================
