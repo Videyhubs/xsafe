@@ -51,11 +51,18 @@ const DOMAIN = "https://www.xsafe.biz.id";
 const PIN = "270491";
 
 function checkPin(){
+  const saved = localStorage.getItem('xsafe_pin');
+  if(saved === PIN) return true;
+
   const p = prompt("Enter PIN");
-  if(p !== PIN){
-    document.body.innerHTML = "<h2 style='text-align:center'>Access Denied</h2>";
-    return false;
+  if(p === PIN){
+    localStorage.setItem('xsafe_pin', PIN);
+    return true;
   }
+
+  document.body.innerHTML = "<h2 style='text-align:center'>Access Denied</h2>";
+  return false;
+}
   return true;
 }
 
@@ -94,7 +101,11 @@ for(let i=1;i<=15;i++){
 }
 
 function getArticle(){
-  return articles[Math.floor(Math.random()*articles.length)];
+  const imgId = Math.floor(Math.random()*1000);
+  const article = articles[Math.floor(Math.random()*articles.length)];
+
+  // ensure fresh image each load
+  return article.replace(/source\.unsplash\.com\/800x400\/[^\"]+/g, `source.unsplash.com/800x400/?video,media,technology&sig=${imgId}`);
 }
 
 // =========================
@@ -113,7 +124,10 @@ function generate(){
 
   localStorage.setItem(code,JSON.stringify({url,clicks:0}));
 
-  document.getElementById('result').innerHTML=`<div class='item'>${short}<br><button onclick="copyText('${short}')">Copy</button></div>`;
+  document.getElementById('result').innerHTML=`<div class='item'>${short}<br>
+<button onclick="copyText('${short}')">Copy</button>
+<button onclick="clearResult()">Clear</button>
+</div>`;
   loadStats();
 }
 
@@ -135,8 +149,19 @@ function bulk(){
     html+=`<div class='item'>${short}<br><button onclick="copyText('${short}')">Copy</button></div>`;
   });
 
-  document.getElementById('bulkResult').innerHTML=html;
+  document.getElementById('bulkResult').innerHTML=html + `<br><button onclick="clearBulk()">Clear All</button>`;
   loadStats();
+}
+
+// =========================
+// CLEAR FUNCTIONS
+// =========================
+function clearResult(){
+  document.getElementById('result').innerHTML = '';
+}
+
+function clearBulk(){
+  document.getElementById('bulkResult').innerHTML = '';
 }
 
 // =========================
