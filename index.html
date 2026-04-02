@@ -51,15 +51,6 @@ function isBot(){
   return /bot|facebook|whatsapp|instagram/i.test(navigator.userAgent);
 }
 
-// SAFE ANTI ADBLOCK (NO BREAK)
-function antiAdblock(){
-  try{
-    const bait=document.createElement('div');
-    bait.className='adsbox';
-    bait.style.height='1px';
-    document.body.appendChild(bait);
-    setTimeout(()=>{ bait.remove(); },200);
-  }catch(e){}
 }
 
 // ARTICLES
@@ -153,7 +144,7 @@ function dashboard(){
 }
 
 window.onload=function(){
-  antiAdblock();
+  
 
   const hash=location.hash.replace('#','');
 
