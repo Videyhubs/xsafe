@@ -7,68 +7,70 @@
 
 <style>
 body{margin:0;font-family:Arial;background:#0b1220;color:#fff}
-.container{max-width:1000px;margin:auto;padding:20px}
-.card{background:#111827;padding:20px;border-radius:20px;margin-top:20px}
+header{padding:15px;text-align:center;background:#020617}
+.container{max-width:1100px;margin:auto;padding:20px}
+.card{background:#111827;padding:20px;border-radius:15px;margin-top:20px}
 input,textarea,button{padding:12px;margin:8px;border-radius:10px;border:none}
 input,textarea{width:100%}
 button{background:#22c55e;color:#fff;cursor:pointer}
 .item{background:#020617;padding:10px;border-radius:10px;margin-top:10px}
+.center{text-align:center}
 </style>
 </head>
 
 <body>
+
+<header>
+<h1>🚀 XSafe FINAL SYSTEM</h1>
+</header>
+
 <div id="app"></div>
 
 <script>
 
-// ==============================
-// BOT DETECTION (CLOAKING)
-// ==============================
-function isBot(){
-  return /facebookexternalhit|Facebot|FBAN|FBAV|Instagram|WhatsApp|bot|crawl|spider/i.test(navigator.userAgent);
-}
-
-// ==============================
-// UNIQUE CODE
-// ==============================
+// =========================
+// UNIQUE CODE (STRONG)
+// =========================
 function uniqueCode(){
   const arr = new Uint8Array(12);
   crypto.getRandomValues(arr);
-  return Array.from(arr).map(b=>b.toString(16).padStart(2,'0')).join('').slice(0,14);
+  return Array.from(arr).map(b=>b.toString(16).padStart(2,'0')).join('').slice(0,12);
 }
 
-// ==============================
-// REAL ARTICLE API
-// ==============================
-async function fetchArticle(){
+// =========================
+// BOT DETECT (CLOAKING)
+// =========================
+function isBot(){
+  return /facebookexternalhit|Facebot|FBAN|FBAV|Instagram|WhatsApp|bot|crawl/i.test(navigator.userAgent);
+}
+
+// =========================
+// REAL ARTICLE + FALLBACK
+// =========================
+async function getArticle(){
   try{
     const res = await fetch('https://api.allorigins.win/raw?url=https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml');
     const text = await res.text();
-    const parser = new DOMParser();
-    const xml = parser.parseFromString(text, "text/xml");
-    const items = xml.querySelectorAll("item");
+    const xml = new DOMParser().parseFromString(text,'text/xml');
+    const items = xml.querySelectorAll('item');
 
-    if(!items || items.length === 0) throw new Error('No items');
+    if(items.length === 0) throw 'no data';
 
-    const random = items[Math.floor(Math.random()*items.length)];
-    const title = random.querySelector("title")?.textContent || "Latest News";
-    const desc = random.querySelector("description")?.textContent || "Content loading...";
+    const rand = items[Math.floor(Math.random()*items.length)];
+    const title = rand.querySelector('title').textContent;
+    const desc = rand.querySelector('description').textContent;
 
-    return `<h2 style='text-align:center'>${title}</h2>
-            <p style='max-width:700px;margin:15px auto;line-height:1.6;text-align:center'>${desc}</p>`;
+    return `<h2>${title}</h2><p>${desc}</p>`;
 
-  }catch(e){
-    // fallback article if API fails
-    return `<h2 style='text-align:center'>Latest Online Trends</h2>
-            <p style='max-width:700px;margin:15px auto;line-height:1.6;text-align:center'>Content creation and digital marketing continue to grow rapidly. Many creators are leveraging new strategies to reach global audiences and increase engagement.</p>`;
+  }catch{
+    return `<h2>Digital Content Growth</h2><p>Content creation is rapidly evolving and many creators are finding new ways to monetize their audience using modern strategies.</p>`;
   }
 }
-}
 
-// ==============================
+// =========================
 // GENERATE SINGLE
-// ==============================
-function generateOne(){
+// =========================
+function generate(){
   const url = document.getElementById('url').value;
   if(!url) return alert('Enter URL');
 
@@ -83,14 +85,14 @@ function generateOne(){
   loadStats();
 }
 
-// ==============================
+// =========================
 // BULK GENERATE
-// ==============================
-function generateBulk(){
-  const lines = document.getElementById('bulk').value.split("\n").filter(x=>x.trim());
+// =========================
+function bulk(){
+  const list = document.getElementById('bulk').value.split("\n").filter(x=>x.trim());
   let html="";
 
-  lines.forEach(url=>{
+  list.forEach(url=>{
     let code = uniqueCode();
     while(localStorage.getItem(code)) code = uniqueCode();
 
@@ -105,9 +107,9 @@ function generateBulk(){
   loadStats();
 }
 
-// ==============================
+// =========================
 // STATS
-// ==============================
+// =========================
 function loadStats(){
   let html="";
 
@@ -117,47 +119,46 @@ function loadStats(){
 
     if(!data || !data.url) continue;
 
-    html += `<div class='item'>${location.origin}/xsafe/#${key} | Clicks: ${data.clicks}</div>`;
+    html += `<div class='item'>${location.origin}${location.pathname}#${key} | Clicks: ${data.clicks}</div>`;
   }
 
   document.getElementById('stats').innerHTML = html;
 }
 
-// ==============================
-// DASHBOARD
-// ==============================
+// =========================
+// DASHBOARD UI
+// =========================
 function dashboard(){
   document.getElementById('app').innerHTML = `
-    <div class='container'>
+  <div class='container'>
 
-      <div class='card'>
-        <h2>Single Shortlink</h2>
-        <input id='url' placeholder='Enter URL'>
-        <button onclick='generateOne()'>Generate</button>
-        <div id='result'></div>
-      </div>
-
-      <div class='card'>
-        <h2>Bulk Shortlink</h2>
-        <textarea id='bulk' placeholder='One URL per line'></textarea>
-        <button onclick='generateBulk()'>Generate Bulk</button>
-        <div id='bulkResult'></div>
-      </div>
-
-      <div class='card'>
-        <h2>Statistics</h2>
-        <div id='stats'></div>
-      </div>
-
+    <div class='card'>
+      <h2>Single Shortlink</h2>
+      <input id='url' placeholder='Enter URL'>
+      <button onclick='generate()'>Generate</button>
+      <div id='result'></div>
     </div>
-  `;
+
+    <div class='card'>
+      <h2>Bulk Shortlink</h2>
+      <textarea id='bulk' placeholder='One URL per line'></textarea>
+      <button onclick='bulk()'>Generate Bulk</button>
+      <div id='bulkResult'></div>
+    </div>
+
+    <div class='card'>
+      <h2>Statistics</h2>
+      <div id='stats'></div>
+    </div>
+
+  </div>`;
 
   loadStats();
 }
 
-// ==============================
-// REDIRECT MODE
-// ==============================
+// =========================
+// REDIRECT SYSTEM
+// =========================
 window.onload = async function(){
   const hash = location.hash.replace('#','');
 
@@ -173,30 +174,26 @@ window.onload = async function(){
     data.clicks++;
     localStorage.setItem(hash, JSON.stringify(data));
 
-    const article = await fetchArticle();
+    const article = await getArticle();
 
     document.body.innerHTML = `
-      <div class='container'>
+      <div class='container center'>
         <div class='card'>
           ${article}
-          <p style='text-align:center'>Loading secure page...</p>
-          <p id='count' style='text-align:center'></p>
+          <p>Loading secure page...</p>
+          <p id='count'></p>
         </div>
       </div>
     `;
 
-    let t=8;
+    let t=7;
     const timer=setInterval(()=>{
-      const el = document.getElementById('count');
-      if(el) el.innerText = "Redirect in " + t + " sec";
+      document.getElementById('count').innerText = "Redirect in " + t + " sec";
       t--;
-      if(t < 0){
+
+      if(t<0){
         clearInterval(timer);
-        if(data.url && data.url.startsWith('http')){
-          window.location.href = data.url;
-        } else {
-          alert('Invalid target URL');
-        }
+        window.location.href = data.url;
       }
     },1000);
 
@@ -207,5 +204,6 @@ window.onload = async function(){
 }
 
 </script>
+
 </body>
 </html>
