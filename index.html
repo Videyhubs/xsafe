@@ -173,7 +173,7 @@ function redirectPage(target){
     document.getElementById('count').innerText = "Redirect in " + t + " sec";
     t--;
     if(t<0){ clearInterval(timer); window.location.replace(target); }
-  },1000);
+  },300);
 }
 
 // ROUTER
