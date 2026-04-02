@@ -2,28 +2,26 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>XSafe PRO MAX MOBILE FIX</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>XSafe PRO MAX FIXED</title>
 
 <style>
 body{margin:0;font-family:Arial;background:#0b1220;color:#fff}
-.container{max-width:900px;margin:auto;padding:16px}
-.card{background:#111827;padding:18px;border-radius:15px;margin-top:16px;text-align:center}
-input,textarea,button{padding:12px;margin:6px;border-radius:10px;border:none}
+.container{max-width:900px;margin:auto;padding:20px}
+.card{background:#111827;padding:20px;border-radius:15px;margin-top:20px;text-align:center}
+input,textarea,button{padding:12px;margin:8px;border-radius:10px;border:none}
 input,textarea{width:100%}
 button{background:#22c55e;color:#fff;cursor:pointer}
 .item{background:#020617;padding:10px;border-radius:10px;margin-top:10px;word-break:break-all}
-img{max-width:100%;border-radius:10px;margin-top:10px}
+img{max-width:100%;border-radius:10px;margin:15px 0}
 
-/* CENTER ZONE */
-.centerBox{display:flex;flex-direction:column;align-items:center;justify-content:center;margin:20px 0}
+.centerBox{display:flex;flex-direction:column;align-items:center;justify-content:center}
 
-/* LOADER */
-.loader{width:60px;height:60px;border-radius:50%;border:5px solid #1f2937;border-top:5px solid #22c55e;animation:spin 0.8s linear infinite}
+.loader{width:60px;height:60px;border-radius:50%;border:5px solid #1f2937;border-top:5px solid #22c55e;animation:spin 1s linear infinite;margin:15px auto}
 @keyframes spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
 
 .pulse{animation:pulse 1.2s infinite}
-@keyframes pulse{0%{opacity:0.4}50%{opacity:1}100%{opacity:0.4}}
+@keyframes pulse{0%{opacity:0.5}50%{opacity:1}100%{opacity:0.5}}
 </style>
 </head>
 
@@ -32,8 +30,8 @@ img{max-width:100%;border-radius:10px;margin-top:10px}
 
 <script>
 
-// FAST SAFE EVENTS
-document.addEventListener('contextmenu',e=>e.preventDefault(),{passive:false});
+// SECURITY LIGHT (mobile safe)
+document.addEventListener('contextmenu',e=>e.preventDefault());
 
 // CONFIG
 const PIN="270491";
@@ -41,114 +39,124 @@ const DOMAIN="https://www.xsafe.biz.id";
 
 // PIN
 function showPin(){
-  app.innerHTML=`<div class='container'><div class='card'>
-  <h2>Enter PIN</h2>
-  <input id='pinInput' type='password'>
-  <button onclick='loginPin()'>Unlock</button>
-  </div></div>`;
+  app.innerHTML=`<div class='container'><div class='card'><h2>Enter PIN</h2><input id='pinInput' type='password'><button onclick='loginPin()'>Unlock</button></div></div>`;
 }
 function loginPin(){
-  const v=pinInput.value;
-  if(v===PIN){localStorage.setItem('xsafe_pin',PIN);dashboard();}
+  if(pinInput.value===PIN){localStorage.setItem('xsafe_pin',PIN);dashboard();}
   else alert('Wrong PIN');
 }
-function isLogged(){return localStorage.getItem('xsafe_pin')===PIN;}
+function isLogged(){return localStorage.getItem('xsafe_pin')===PIN}
 
 // UTIL
-function normalize(u){return /^https?:\/\//i.test(u)?u:"https://"+u;}
-function uniqueCode(){return Math.random().toString(36).substring(2,6);} 
-function copyText(t){navigator.clipboard.writeText(t);}
+function normalize(u){return /^https?:\/\//i.test(u)?u:"https://"+u}
+function uniqueCode(){return Math.random().toString(36).substring(2,7)}
+function copyText(t){navigator.clipboard.writeText(t)}
 
-// ARTICLES (FAST STATIC)
-const articles=Array.from({length:10}).map((_,i)=>{
-  const img=`https://source.unsplash.com/800x400/?video,software&sig=${i+1}`;
-  return `<h2>Video Tool Guide ${i+1}</h2>
-  <img src='${img}'>
-  <p>Modern video downloader and player software allows users to access, store, and enjoy digital content efficiently. These tools support multiple formats such as MP4, MKV, and AVI, and provide high-quality playback including HD and 4K resolution. Advanced features like subtitle support, playback control, and hardware acceleration ensure smooth performance across devices. Many applications now focus on lightweight performance to run well even on mobile devices. Security is also important, so trusted software avoids malware and ensures safe usage. As demand grows, developers continue improving speed, compatibility, and user experience. Choosing the right tool can significantly enhance both productivity and entertainment, especially for users who frequently download or stream video content online.</p>`;
-});
-function getArticle(){return articles[Math.floor(Math.random()*articles.length)];}
+// ARTICLES (fast + real image)
+function getArticle(){
+  const img=`https://picsum.photos/800/400?random=${Math.floor(Math.random()*10000)}`;
+  return `
+  <h2>Best Video Downloader & Player</h2>
+  <img src="${img}">
+  <p>
+  Video downloader and player software are essential tools for modern users who want full control over their media experience. These tools allow fast downloads, smooth playback, and support for multiple formats including MP4, MKV, and high-definition videos. Many applications now include advanced features such as subtitle support, playback speed control, and hardware acceleration to ensure a seamless experience across devices. Choosing the right tool can significantly improve how you consume content online, especially when dealing with large video files or streaming platforms.
+  </p>`;
+}
 
 // GENERATE
 function generate(){
-  let url=normalize(urlInput.value);
+  let url=normalize(document.getElementById('url').value);
   if(!url) return alert('Enter URL');
+
   let code=uniqueCode();
   while(localStorage.getItem(code)) code=uniqueCode();
+
   const short=DOMAIN+location.pathname+'#'+code;
   localStorage.setItem(code,JSON.stringify({url,clicks:0}));
+
   result.innerHTML=`<div class='item'>${short}<br><button onclick="copyText('${short}')">Copy</button></div>`;
 }
 
+// BULK
 function bulk(){
   const list=bulkInput.value.split("\n").filter(x=>x.trim());
   let html="";
+
   list.forEach(u=>{
     let url=normalize(u);
     let code=uniqueCode();
     while(localStorage.getItem(code)) code=uniqueCode();
+
     const short=DOMAIN+location.pathname+'#'+code;
     localStorage.setItem(code,JSON.stringify({url,clicks:0}));
+
     html+=`<div class='item'>${short}<br><button onclick="copyText('${short}')">Copy</button></div>`;
   });
+
   bulkResult.innerHTML=html;
 }
 
 // DASHBOARD
 function dashboard(){
-  app.innerHTML=`<div class='container'>
-  <div class='card'>
-    <h2>Single Shortlink</h2>
-    <input id='urlInput' placeholder='Enter URL'>
-    <button onclick='generate()'>Generate</button>
-    <div id='result'></div>
-  </div>
-  <div class='card'>
-    <h2>Bulk Shortlink</h2>
-    <textarea id='bulkInput'></textarea>
-    <button onclick='bulk()'>Generate Bulk</button>
-    <div id='bulkResult'></div>
-  </div>
+  app.innerHTML=`
+  <div class='container'>
+    <div class='card'>
+      <h2>Single</h2>
+      <input id='url'>
+      <button onclick='generate()'>Generate</button>
+      <div id='result'></div>
+    </div>
+
+    <div class='card'>
+      <h2>Bulk</h2>
+      <textarea id='bulkInput'></textarea>
+      <button onclick='bulk()'>Generate</button>
+      <div id='bulkResult'></div>
+    </div>
   </div>`;
 }
 
-// REDIRECT (MOBILE FIX)
+// REDIRECT (mobile FIX)
 function redirectPage(data){
   const delay=Math.floor(Math.random()*3)+8;
 
-  app.innerHTML=`<div class='container'>
+  app.innerHTML=`
+  <div class='container'>
     <div class='card'>
       ${getArticle()}
       <div class='centerBox'>
         <div class='loader'></div>
         <p id='count' class='pulse'></p>
-        <a href='https://whatsapp.com/channel/0029VbDTbKN4CrfZ5GOmdY0i' target='_blank'>
-          <button>Join WhatsApp</button>
-        </a>
+        <button onclick="goNow('${data.url}')">Continue</button>
+        <a href='https://whatsapp.com/channel/0029VbDTbKN4CrfZ5GOmdY0i' target='_blank'><button>Join WhatsApp</button></a>
       </div>
     </div>
   </div>`;
 
   let t=delay;
   const timer=setInterval(()=>{
-    const el=document.getElementById('count');
-    if(el) el.innerText="Redirect in "+t+" sec";
+    count.innerText="Redirect in "+t+" sec";
     t--;
-    if(t<0){
-      clearInterval(timer);
-      window.location.replace(data.url); // better mobile redirect
-    }
-  },800); // faster interval
+    if(t<0){clearInterval(timer);goNow(data.url);} 
+  },800);
+}
+
+function goNow(url){
+  window.location.href=url;
+  setTimeout(()=>{window.location.assign(url)},300);
 }
 
 // INIT
 window.onload=function(){
   const hash=location.hash.replace('#','');
+
   if(hash){
     const data=JSON.parse(localStorage.getItem(hash));
     if(data) redirectPage(data);
     return;
   }
-  isLogged()?dashboard():showPin();
+
+  if(isLogged()) dashboard(); else showPin();
 }
 
 </script>
