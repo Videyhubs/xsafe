@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>XSafe FINAL PRO++</title>
+<title>XSafe Shortlink</title>
 
 <style>
 body{margin:0;font-family:Arial;background:#0b1220;color:#fff}
@@ -23,7 +23,14 @@ iframe{margin-top:10px;border-radius:10px}
 
 <script>
 
+// =========================
+// CONFIG DOMAIN
+// =========================
+const DOMAIN = "https://www.xsafe.biz.id";
+
+// =========================
 // PIN SYSTEM
+// =========================
 const PIN = "270491";
 function checkPin(){
   const p = prompt("Enter PIN:");
@@ -34,17 +41,38 @@ function checkPin(){
   return true;
 }
 
-// UNIQUE CODE
+// =========================
+// SHORT UNIQUE CODE (SUPER RANDOM)
+// =========================
 function uniqueCode(){
-  return Math.random().toString(36).substring(2,10) + Date.now().toString(36);
+  const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  let code = "";
+  for(let i=0;i<6;i++){
+    code += chars[Math.floor(Math.random()*chars.length)];
+  }
+  return code;
 }
 
+// =========================
+// NORMALIZE URL (http/https/www)
+// =========================
+function normalizeURL(url){
+  if(!/^https?:\/\//i.test(url)){
+    return "https://" + url;
+  }
+  return url;
+}
+
+// =========================
 // BOT DETECT
+// =========================
 function isBot(){
   return /facebookexternalhit|Facebot|FBAN|FBAV|Instagram|WhatsApp|bot/i.test(navigator.userAgent);
 }
 
-// ARTICLE GENERATOR (800+ chars)
+// =========================
+// ARTICLES
+// =========================
 const articles = [
 `<h2>Best Video Downloader Tools in 2026</h2>
 <img src="https://images.unsplash.com/photo-1518770660439-4636190af475">
@@ -52,26 +80,26 @@ const articles = [
 
 `<h2>Top Video Player Software for Smooth Playback</h2>
 <iframe width="100%" height="200" src="https://www.youtube.com/embed/aqz-KE-bpKQ" frameborder="0" allowfullscreen></iframe>
-<p>A reliable video player is essential for enjoying multimedia content without lag or compatibility issues. Modern video player software supports a wide range of formats, including MP4, MKV, AVI, and more. Advanced players come with features such as subtitle synchronization, audio enhancement, and hardware acceleration for smoother playback. Many users prefer lightweight players that do not consume excessive system resources while still delivering high-quality visuals. Additionally, customizable interfaces and keyboard shortcuts enhance the overall user experience. Whether for watching movies, streaming content, or playing downloaded videos, having the right player ensures seamless entertainment. As technology advances, video players continue to improve in performance, making them indispensable tools for digital media consumption.</p>`,
-
-`<h2>How to Download Videos Safely Online</h2>
-<img src="https://images.unsplash.com/photo-1498050108023-c5249f4df085">
-<p>Downloading videos safely is a priority for users who want to avoid harmful software or low-quality content. Trusted platforms and tools provide secure downloading options without hidden risks. Users should always verify the source of the video and ensure that the downloader being used is reputable. Many modern tools offer built-in virus protection and encrypted connections to safeguard data during the download process. Additionally, selecting the correct format and resolution ensures optimal playback quality. It is also important to respect copyright policies and use downloads for personal purposes. By following best practices, users can enjoy offline content safely and efficiently. With the right approach, video downloading becomes a convenient and secure experience.</p>`
+<p>A reliable video player is essential for enjoying multimedia content without lag or compatibility issues. Modern video player software supports a wide range of formats, including MP4, MKV, AVI, and more. Advanced players come with features such as subtitle synchronization, audio enhancement, and hardware acceleration for smoother playback. Many users prefer lightweight players that do not consume excessive system resources while still delivering high-quality visuals. Additionally, customizable interfaces and keyboard shortcuts enhance the overall user experience. Whether for watching movies, streaming content, or playing downloaded videos, having the right player ensures seamless entertainment. As technology advances, video players continue to improve in performance, making them indispensable tools for digital media consumption.</p>`
 ];
 
 function getArticle(){
   return articles[Math.floor(Math.random()*articles.length)];
 }
 
-// GENERATE
+// =========================
+// GENERATE SINGLE
+// =========================
 function generate(){
-  const url = document.getElementById('url').value;
+  let url = document.getElementById('url').value;
   if(!url) return alert('Enter URL');
+
+  url = normalizeURL(url);
 
   let code = uniqueCode();
   while(localStorage.getItem(code)) code = uniqueCode();
 
-  const short = location.origin + location.pathname + '#' + code;
+  const short = DOMAIN + location.pathname + '#' + code;
 
   localStorage.setItem(code, JSON.stringify({url,clicks:0}));
 
@@ -79,16 +107,20 @@ function generate(){
   loadStats();
 }
 
+// =========================
 // BULK
+// =========================
 function bulk(){
   const list = document.getElementById('bulk').value.split("\n").filter(x=>x.trim());
   let html="";
 
-  list.forEach(url=>{
+  list.forEach(u=>{
+    let url = normalizeURL(u);
+
     let code = uniqueCode();
     while(localStorage.getItem(code)) code = uniqueCode();
 
-    const short = location.origin + location.pathname + '#' + code;
+    const short = DOMAIN + location.pathname + '#' + code;
 
     localStorage.setItem(code, JSON.stringify({url,clicks:0}));
 
@@ -99,7 +131,9 @@ function bulk(){
   loadStats();
 }
 
+// =========================
 // STATS
+// =========================
 function loadStats(){
   let html="";
 
@@ -109,13 +143,15 @@ function loadStats(){
 
     if(!data || !data.url) continue;
 
-    html += `<div class='item'>${location.origin}${location.pathname}#${key} | Clicks: ${data.clicks}</div>`;
+    html += `<div class='item'>${DOMAIN}${location.pathname}#${key} | Clicks: ${data.clicks}</div>`;
   }
 
   document.getElementById('stats').innerHTML = html;
 }
 
+// =========================
 // DASHBOARD
+// =========================
 function dashboard(){
   if(!checkPin()) return;
 
@@ -146,7 +182,9 @@ function dashboard(){
   loadStats();
 }
 
+// =========================
 // REDIRECT
+// =========================
 window.onload = function(){
   const hash = location.hash.replace('#','');
 
@@ -163,7 +201,7 @@ window.onload = function(){
     localStorage.setItem(hash, JSON.stringify(data));
 
     const article = getArticle();
-    const delay = Math.floor(Math.random()*3)+8; // 8-10 sec
+    const delay = Math.floor(Math.random()*3)+8;
 
     document.body.innerHTML = `
       <div class='container'>
