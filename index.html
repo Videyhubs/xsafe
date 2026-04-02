@@ -50,17 +50,31 @@ document.addEventListener('keydown', function(e){
 const DOMAIN = "https://www.xsafe.biz.id";
 const PIN = "270491";
 
+function renderPinScreen(){
+  const app = document.getElementById('app');
+  app.innerHTML = `
+    <div class='container'>
+      <div class='card'>
+        <h2>Enter PIN</h2>
+        <input id='pinInput' type='password' placeholder='Enter PIN'>
+        <button onclick='submitPin()'>Unlock</button>
+      </div>
+    </div>`;
+}
+
+function submitPin(){
+  const val = document.getElementById('pinInput').value;
+  if(val === PIN){
+    localStorage.setItem('xsafe_pin', PIN);
+    dashboard(true);
+  } else {
+    alert('Wrong PIN');
+  }
+}
+
 function checkPin(){
   const saved = localStorage.getItem('xsafe_pin');
   if(saved === PIN) return true;
-
-  const p = prompt("Enter PIN");
-  if(p === PIN){
-    localStorage.setItem('xsafe_pin', PIN);
-    return true;
-  }
-
-  document.body.innerHTML = "<h2 style='text-align:center'>Access Denied</h2>";
   return false;
 }
   return true;
@@ -195,8 +209,11 @@ function loadStats(){
 // =========================
 // DASHBOARD
 // =========================
-function dashboard(){
-  if(!checkPin()) return;
+function dashboard(force=false){
+  if(!checkPin() && !force){
+    renderPinScreen();
+    return;
+  }
 
   document.getElementById('app').innerHTML=`
   <div class='container'>
@@ -227,7 +244,6 @@ function dashboard(){
 // REDIRECT
 // =========================
 window.onload=function(){
-
   const hash=location.hash.replace('#','');
 
   if(hash){
