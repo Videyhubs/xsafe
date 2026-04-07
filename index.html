@@ -193,21 +193,35 @@ function redirectPage(target,code){
       clearInterval(timer);
       window.location.href = target;
     }
-  },1000);
+  },800);
 }
 
-window.onload = ()=>{
-  const code = location.hash.replace("#","");
+window.onload = () => {
+  const code = location.hash.replace("#","").trim();
+
   if(code){
-    db.ref("links/"+code).once("value").then(snap=>{
+    db.ref("links/" + code).once("value")
+    .then(snap => {
       const data = snap.val();
-      if(data && data.url) redirectPage(data.url,code);
-      else app.innerHTML = "<h2 style='text-align:center'>Link not found</h2>";
+
+      if(data && data.url){
+        redirectPage(data.url, code);
+      } else {
+        console.log("NOT FOUND → redirect smartlink");
+        redirectPage(AUTO_SHORT_URL, "auto");
+      }
+    })
+    .catch(err => {
+      console.error("Firebase error:", err);
+      redirectPage(AUTO_SHORT_URL, "error");
     });
+
     return;
   }
-  if(isLogin()) dashboard(); else showPin();
-}
+
+  if(isLogin()) dashboard(); 
+  else showPin();
+};
 </script>
 </body>
 </html>
