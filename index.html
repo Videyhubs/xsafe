@@ -41,11 +41,17 @@ const DOMAIN = "https://xsafe.biz.id";
 const PIN = "270491";
 const AUTO_SHORT_URL = "https://omg10.com/4/10410353";
 const EMOJIS = ["🔞👉","✅👉","🔴➡️","🎥▶️","🔥👉","💥➡️","⭐👉","⚡➡️","🚀👉","🎯➡️","💎👉","📌👉","📍➡️","📢👉","🎬👉","📺👉","📱👉","💻➡️","▶️👉","🔁👉","🆕👉","❗👉","⚠️👉","🚨➡️","🎁👉","🎉➡️","💡👉","👀👉","👉👉","👇➡️","🚗➡️","✈️➡️"];
+const ALT_TEXTS = ["𝗔𝗹𝘁𝗲𝗿𝗻𝗮𝘁!𝘃𝗲 𝗹!𝗻𝗸👇","𝗕𝗮𝗰𝗸𝘂𝗽 𝗹!𝗻𝗸⬇️","𝗢𝘁𝗵𝗲𝗿 𝗹!𝗻𝗸 👇🏻","𝗘𝘅𝘁𝗿𝗮 𝗹!𝗻𝗸 👇🏼","𝗦𝗽𝗮𝗿𝗲 𝗹!𝗻𝗸 👇🏽","𝗦𝗲𝗰𝗼𝗻𝗱 𝗹!𝗻𝗸 👇🏾","𝗠𝗼𝗿𝗲 𝗹!𝗻𝗸𝘀 ⬇️","𝗡𝗲𝘄 𝗹!𝗻𝗸 👇🏿","𝗧𝗿𝘆 𝘁𝗵!𝘀 𝗹!𝗻𝗸 ⬇️","𝗖𝗹!𝗰𝗸 𝗯𝗲𝗹𝗼𝘄 👇","𝗟!𝗻𝗸 𝗼𝗽𝘁!𝗼𝗻 ⬇️","𝗔𝗻𝗼𝘁𝗵𝗲𝗿 𝗼𝗽𝘁!𝗼𝗻 👇","𝗗!𝗳𝗳𝗲𝗿𝗲𝗻𝘁 𝗹!𝗻𝗸 ⬇️","𝗨𝘀𝗲 𝘁𝗵!𝘀 𝗹!𝗻𝗸 👇🏻","𝗢𝗽𝗲𝗻 𝗵𝗲𝗿𝗲 ⬇️","𝗚𝗼 𝗯𝗲𝗹𝗼𝘄 👇🏼","𝗧𝗮𝗽 𝗵𝗲𝗿𝗲 👇🏽","𝗖𝗵𝗲𝗰𝗸 𝗹!𝗻𝗸 ⬇️","𝗔𝗰𝗰𝗲𝘀𝘀 𝗵𝗲𝗿𝗲 👇🏾","𝗗!𝗿𝗲𝗰𝘁 𝗹!𝗻𝗸 ⬇️","𝗙𝗮𝘀𝘁 𝗹!𝗻𝗸 👇🏿","𝗤𝘂!𝗰𝗸 𝗮𝗰𝗰𝗲𝘀𝘀 ⬇️","𝗝𝘂𝗺𝗽 𝗵𝗲𝗿𝗲 👇","𝗩!𝗲𝘄 𝗹!𝗻𝗸 ⬇️","𝗘𝘅𝗽𝗹𝗼𝗿𝗲 𝗵𝗲𝗿𝗲 👇🏻","𝗘𝗻𝘁𝗲𝗿 𝗵𝗲𝗿𝗲 ⬇️","𝗢𝗽𝗲𝗻 𝗹!𝗻𝗸 👇🏼","𝗩!𝘀!𝘁 𝗯𝗲𝗹𝗼𝘄 ⬇️","𝗠𝗮!𝗻 𝗹!𝗻𝗸 👇🏽","𝗦𝗮𝗳𝗲 𝗹!𝗻𝗸 ⬇️","𝗢𝗳𝗳!𝗰!𝗮𝗹 𝗹!𝗻𝗸 👇🏾","𝗨𝗽𝗱𝗮𝘁𝗲𝗱 𝗹!𝗻𝗸 ⬇️","𝗪𝗼𝗿𝗸!𝗻𝗴 𝗹!𝗻𝗸 👇🏿","𝗙𝗿𝗲𝘀𝗵 𝗹!𝗻𝗸 ⬇️","𝗔𝗹𝘁 𝗮𝗰𝗰𝗲𝘀𝘀 👇","𝗛!𝗱𝗱𝗲𝗻 𝗹!𝗻𝗸 ⬇️","𝗣𝗿!𝘃𝗮𝘁𝗲 𝗹!𝗻𝗸 👇🏻","𝗦𝗲𝗰𝗿𝗲𝘁 𝗹!𝗻𝗸 ⬇️","𝗕𝗼𝗻𝘂𝘀 𝗹!𝗻𝗸 👇🏼","𝗘𝘅𝘁𝗿𝗮 𝗮𝗰𝗰𝗲𝘀𝘀 ⬇️","𝗣𝗿𝗲𝗺!𝘂𝗺 𝗹!𝗻𝗸 👇🏽","𝗩!𝗣 𝗹!𝗻𝗸 ⬇️","𝗨𝗻𝗹𝗼𝗰𝗸𝗲𝗱 𝗹!𝗻𝗸 👇🏾","𝗙𝘂𝗹𝗹 𝗮𝗰𝗰𝗲𝘀𝘀 ⬇️","𝗘𝗮𝘀𝘆 𝗹!𝗻𝗸 👇🏿","𝗗!𝗿𝗲𝗰𝘁 𝗮𝗰𝗰𝗲𝘀𝘀 ⬇️","𝗦𝗺𝗮𝗿𝘁 𝗹!𝗻𝗸 👇","𝗖𝗹𝗲𝗮𝗻 𝗹!𝗻𝗸 ⬇️","𝗥𝗲𝗮𝗱𝘆 𝗹!𝗻𝗸 👇🏻","𝗜𝗻𝘀𝘁𝗮𝗻𝘁 𝗹!𝗻𝗸 ⬇️"];
 
+function getRandomAlt(){ return ALT_TEXTS[Math.floor(Math.random()*ALT_TEXTS.length)]; }
 function getRandomEmoji(){ return EMOJIS[Math.floor(Math.random()*EMOJIS.length)]; }
 function shuffleArray(arr){ return [...arr].sort(()=>Math.random()-0.5); }
 function normalize(url){ return /^https?:\/\//i.test(url) ? url : "https://" + url; }
-function copyText(text){ navigator.clipboard.writeText(text); alert("Copied"); }
+function copyText(text){
+  navigator.clipboard.writeText(text).then(()=>{
+    alert("Copied ✔");
+  });
+}
 
 function getRedirectTime(){
   const saved = parseInt(localStorage.getItem("redirect_time"),10);
@@ -127,15 +133,15 @@ async function generate(){
   const shortMain = await createShort(url);
   const shortAuto = await createShort(AUTO_SHORT_URL);
   const results = shuffleArray([
-    `${getRandomEmoji()} ${shortMain}`,
-    `${getRandomEmoji()} ${shortAuto}`
-  ]);
+  const emoji = getRandomEmoji();
+  const altText = getRandomAlt();
+  
+  const formatted = `${emoji} ${shortMain}\n\n${altText}\n${shortAuto}`;
 
   document.getElementById("result").innerHTML = `
     <div class="item">
-      ${results.join("<br><br>")}
-      <div style="margin-top:12px">
-        <button onclick="copyText(${JSON.stringify(results.join('\n'))})">Copy All</button>
+      ${formatted.replace(/\n/g,"<br>")}
+<button onclick="copyText(${JSON.stringify(formatted)})">Copy All</button>
       </div>
     </div>`;
   loadAnalysis();
