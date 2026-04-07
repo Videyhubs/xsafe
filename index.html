@@ -4,27 +4,39 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>xsafe Pro</title>
+
 <style>
 body{margin:0;font-family:Arial,sans-serif;background:#0b1220;color:#fff}
 .container{max-width:1000px;margin:auto;padding:20px}
 .card{background:#111827;padding:20px;border-radius:15px;margin-top:20px}
 input,textarea,button{width:100%;padding:12px;margin:8px 0;border:none;border-radius:10px;box-sizing:border-box}
 button{background:#22c55e;color:#fff;cursor:pointer;font-weight:bold}
-.delete-btn{background:#ef4444}.item{background:#020617;padding:12px;border-radius:10px;margin-top:10px;word-break:break-all}
-img{max-width:100%;border-radius:10px;margin:15px 0}.loader{margin:20px auto;width:60px;height:60px;border:5px solid #1f2937;border-top:5px solid #22c55e;border-radius:50%;animation:spin 1s linear infinite}
+.delete-btn{background:#ef4444}
+.item{background:#020617;padding:12px;border-radius:10px;margin-top:10px;word-break:break-all}
+img{max-width:100%;border-radius:10px;margin:15px 0}
+.loader{margin:20px auto;width:60px;height:60px;border:5px solid #1f2937;border-top:5px solid #22c55e;border-radius:50%;animation:spin 1s linear infinite}
 @keyframes spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
-.center{display:flex;flex-direction:column;align-items:center}.article{line-height:1.8}.article p{margin:16px 0;text-align:justify}
-.sticky-cta{position:sticky;bottom:15px;z-index:999;margin-top:20px}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
-.stat{font-size:24px;font-weight:bold}.small{font-size:12px;color:#94a3b8}.actions{display:flex;gap:10px;margin-top:10px}
+.center{display:flex;flex-direction:column;align-items:center}
+.article{line-height:1.8}
+.article p{margin:16px 0;text-align:justify}
+.sticky-cta{position:sticky;bottom:15px;z-index:999;margin-top:20px}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
+.stat{font-size:24px;font-weight:bold}
+.small{font-size:12px;color:#94a3b8}
+.actions{display:flex;gap:10px;margin-top:10px}
 </style>
+
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <script src="article.js"></script>
 </head>
+
 <body>
 <div id="app"></div>
+
 <script>
 const app = document.getElementById("app");
+
 const firebaseConfig = {
   apiKey: "AIzaSyDNepkZLKn-_Jdoc5cLLituXfwTOviDM4U",
   authDomain: "xsafe-shortlink.firebaseapp.com",
@@ -34,19 +46,39 @@ const firebaseConfig = {
   messagingSenderId: "883524196114",
   appId: "1:883524196114:web:2d3a1612ff74bb78d845cb"
 };
+
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
 const DOMAIN = "https://xsafe.biz.id";
 const PIN = "270491";
 const AUTO_SHORT_URL = "https://omg10.com/4/10410353";
+
+/* ========= EMOJI ========= */
 const EMOJIS = ["🔞👉","✅👉","🔴➡️","🎥▶️","🔥👉","💥➡️","⭐👉","⚡➡️","🚀👉","🎯➡️","💎👉","📌👉","📍➡️","📢👉","🎬👉","📺👉","📱👉","💻➡️","▶️👉","🔁👉","🆕👉","❗👉","⚠️👉","🚨➡️","🎁👉","🎉➡️","💡👉","👀👉","👉👉","👇➡️","🚗➡️","✈️➡️"];
-
 function getRandomEmoji(){ return EMOJIS[Math.floor(Math.random()*EMOJIS.length)]; }
-function shuffleArray(arr){ return [...arr].sort(()=>Math.random()-0.5); }
-function normalize(url){ return /^https?:\/\//i.test(url) ? url : "https://" + url; }
-function copyText(text){ navigator.clipboard.writeText(text); alert("Copied"); }
 
+/* ========= ALT TEXT ========= */
+const ALT_TEXT = ["𝗔𝗹𝘁𝗲𝗿𝗻𝗮𝘁!𝘃𝗲 𝗹!𝗻𝗸👇","𝗕𝗮𝗰𝗸𝘂𝗽 𝗹!𝗻𝗸⬇️","𝗢𝘁𝗵𝗲𝗿 𝗹!𝗻𝗸 👇🏻","𝗘𝘅𝘁𝗿𝗮 𝗹!𝗻𝗸 👇🏼","𝗦𝗽𝗮𝗿𝗲 𝗹!𝗻𝗸 👇🏽","𝗦𝗲𝗰𝗼𝗻𝗱 𝗹!𝗻𝗸 👇🏾","𝗠𝗼𝗿𝗲 𝗹!𝗻𝗸𝘀 ⬇️","𝗡𝗲𝘄 𝗹!𝗻𝗸 👇🏿","𝗧𝗿𝘆 𝘁𝗵!𝘀 𝗹!𝗻𝗸 ⬇️","𝗖𝗹!𝗰𝗸 𝗯𝗲𝗹𝗼𝘄 👇","𝗟!𝗻𝗸 𝗼𝗽𝘁!𝗼𝗻 ⬇️","𝗔𝗻𝗼𝘁𝗵𝗲𝗿 𝗼𝗽𝘁!𝗼𝗻 👇","𝗗!𝗳𝗳𝗲𝗿𝗲𝗻𝘁 𝗹!𝗻𝗸 ⬇️","𝗨𝘀𝗲 𝘁𝗵!𝘀 𝗹!𝗻𝗸 👇🏻","𝗢𝗽𝗲𝗻 𝗵𝗲𝗿𝗲 ⬇️","𝗚𝗼 𝗯𝗲𝗹𝗼𝘄 👇🏼","𝗧𝗮𝗽 𝗵𝗲𝗿𝗲 👇🏽","𝗖𝗵𝗲𝗰𝗸 𝗹!𝗻𝗸 ⬇️","𝗔𝗰𝗰𝗲𝘀𝘀 𝗵𝗲𝗿𝗲 👇🏾","𝗗!𝗿𝗲𝗰𝘁 𝗹!𝗻𝗸 ⬇️","𝗙𝗮𝘀𝘁 𝗹!𝗻𝗸 👇🏿","𝗤𝘂!𝗰𝗸 𝗮𝗰𝗰𝗲𝘀𝘀 ⬇️","𝗝𝘂𝗺𝗽 𝗵𝗲𝗿𝗲 👇","𝗩!𝗲𝘄 𝗹!𝗻𝗸 ⬇️","𝗘𝘅𝗽𝗹𝗼𝗿𝗲 𝗵𝗲𝗿𝗲 👇🏻","𝗘𝗻𝘁𝗲𝗿 𝗵𝗲𝗿𝗲 ⬇️","𝗢𝗽𝗲𝗻 𝗹!𝗻𝗸 👇🏼","𝗩!𝘀!𝘁 𝗯𝗲𝗹𝗼𝘄 ⬇️","𝗠𝗮!𝗻 𝗹!𝗻𝗸 👇🏽","𝗦𝗮𝗳𝗲 𝗹!𝗻𝗸 ⬇️","𝗢𝗳𝗳!𝗰!𝗮𝗹 𝗹!𝗻𝗸 👇🏾","𝗨𝗽𝗱𝗮𝘁𝗲𝗱 𝗹!𝗻𝗸 ⬇️","𝗪𝗼𝗿𝗸!𝗻𝗴 𝗹!𝗻𝗸 👇🏿","𝗙𝗿𝗲𝘀𝗵 𝗹!𝗻𝗸 ⬇️","𝗔𝗹𝘁 𝗮𝗰𝗰𝗲𝘀𝘀 👇","𝗛!𝗱𝗱𝗲𝗻 𝗹!𝗻𝗸 ⬇️","𝗣𝗿!𝘃𝗮𝘁𝗲 𝗹!𝗻𝗸 👇🏻","𝗦𝗲𝗰𝗿𝗲𝘁 𝗹!𝗻𝗸 ⬇️","𝗕𝗼𝗻𝘂𝘀 𝗹!𝗻𝗸 👇🏼","𝗘𝘅𝘁𝗿𝗮 𝗮𝗰𝗰𝗲𝘀𝘀 ⬇️","𝗣𝗿𝗲𝗺!𝘂𝗺 𝗹!𝗻𝗸 👇🏽","𝗩!𝗣 𝗹!𝗻𝗸 ⬇️","𝗨𝗻𝗹𝗼𝗰𝗸𝗲𝗱 𝗹!𝗻𝗸 👇🏾","𝗙𝘂𝗹𝗹 𝗮𝗰𝗰𝗲𝘀𝘀 ⬇️","𝗘𝗮𝘀𝘆 𝗹!𝗻𝗸 👇🏿","𝗗!𝗿𝗲𝗰𝘁 𝗮𝗰𝗰𝗲𝘀𝘀 ⬇️","𝗦𝗺𝗮𝗿𝘁 𝗹!𝗻𝗸 👇","𝗖𝗹𝗲𝗮𝗻 𝗹!𝗻𝗸 ⬇️","𝗥𝗲𝗮𝗱𝘆 𝗹!𝗻𝗸 👇🏻","𝗜𝗻𝘀𝘁𝗮𝗻𝘁 𝗹!𝗻𝗸 ⬇️"];
+function getRandomAlt(){ return ALT_TEXT[Math.floor(Math.random()*ALT_TEXT.length)]; }
+
+/* ========= UTILS ========= */
+function normalize(url){ return /^https?:\/\//i.test(url) ? url : "https://" + url; }
+
+function copyText(text){
+  navigator.clipboard.writeText(text).then(()=>alert("Copied ✅"));
+}
+
+function formatResult(main, auto){
+  const e1 = getRandomEmoji();
+  const e2 = getRandomEmoji();
+  const alt = getRandomAlt();
+
+  return {
+    text: `${e1} ${main}\n\n${alt}\n${e2} ${auto}`,
+    html: `${e1} ${main}<br><br>${alt}<br>${e2} ${auto}`
+  };
+}
 function getRedirectTime(){
   const saved = parseInt(localStorage.getItem("redirect_time"),10);
   return Number.isFinite(saved) && saved >= 1 ? saved : 3;
@@ -119,6 +151,7 @@ async function createShort(url){
   return `${DOMAIN}/#${code}`;
 }
 
+/* ==== UPDATED GENERATE ==== */
 async function generate(){
   let url = document.getElementById("xsafeput").value.trim();
   if(!url) return alert("Enter URL");
@@ -126,32 +159,28 @@ async function generate(){
 
   const shortMain = await createShort(url);
   const shortAuto = await createShort(AUTO_SHORT_URL);
-  const results = shuffleArray([
-    `${getRandomEmoji()} ${shortMain}`,
-    `${getRandomEmoji()} ${shortAuto}`
-  ]);
+
+  const result = formatResult(shortMain, shortAuto);
 
   document.getElementById("result").innerHTML = `
     <div class="item">
-      ${results.join("<br><br>")}
+      ${result.html}
       <div style="margin-top:12px">
-        <button onclick="copyText(${JSON.stringify(results.join('\n'))})">Copy All</button>
+        <button onclick='copyText(${JSON.stringify(result.text)})'>Copy All</button>
       </div>
     </div>`;
   loadAnalysis();
 }
 
+/* ==== UPDATED BULK ==== */
 async function bulk(){
   const lines = document.getElementById("bulkInput").value.split("\n").filter(x=>x.trim());
   let html = "";
   for (const link of lines) {
     const shortMain = await createShort(normalize(link));
     const shortAuto = await createShort(AUTO_SHORT_URL);
-    const results = shuffleArray([
-      `${getRandomEmoji()} ${shortMain}`,
-      `${getRandomEmoji()} ${shortAuto}`
-    ]);
-    html += `<div class="item">${results.join("<br><br>")}</div>`;
+    const result = formatResult(shortMain, shortAuto);
+    html += `<div class="item">${result.html}</div>`;
   }
   document.getElementById("bulkResult").innerHTML = html;
   loadAnalysis();
@@ -171,7 +200,23 @@ function loadAnalysis(){
 }
 
 function dashboard(){
-  app.innerHTML = `<div class="container"><div class="card"><h2>Create Shortlink</h2><input id="xsafeput" placeholder="Enter URL"><button onclick="generate()">Generate</button><div id="result"></div></div><div class="card"><h2>Bulk Generator</h2><textarea id="bulkInput" rows="5"></textarea><button onclick="bulk()">Generate Bulk</button><div id="bulkResult"></div></div><div class="card"><h2>Redirect Cooldown Settings</h2><input id="redirectTime" type="number" min="1" value="${getRedirectTime()}"><button onclick="saveRedirectTime()">Save</button></div><div id="analysis"></div></div>`;
+  app.innerHTML = `<div class="container">
+  <div class="card"><h2>Create Shortlink</h2>
+  <input id="xsafeput" placeholder="Enter URL">
+  <button onclick="generate()">Generate</button>
+  <div id="result"></div></div>
+
+  <div class="card"><h2>Bulk Generator</h2>
+  <textarea id="bulkInput" rows="5"></textarea>
+  <button onclick="bulk()">Generate Bulk</button>
+  <div id="bulkResult"></div></div>
+
+  <div class="card"><h2>Redirect Cooldown Settings</h2>
+  <input id="redirectTime" type="number" min="1" value="${getRedirectTime()}">
+  <button onclick="saveRedirectTime()">Save</button></div>
+
+  <div id="analysis"></div>
+  </div>`;
   loadAnalysis();
 }
 
@@ -179,14 +224,14 @@ function redirectPage(target,code){
   if(!target){ app.innerHTML = "<h2 style='text-align:center'>Invalid URL</h2>"; return; }
   updateClick(code);
   let sec = getRedirectTime();
-  const article = typeof getRandomArticle === 'function' ? getRandomArticle() : null;
 
-  app.innerHTML = `<div class="container"><div class="card">${article ? `<div class="article"><small>${article.category.toUpperCase()} • ${article.publishDate} • ${article.author} • ${article.readTime}</small><h2>${article.title}</h2><small>/${article.slug}</small><p><i>${article.metaDescription}</i></p><img src="https://picsum.photos/900/400?${Date.now()}">${article.content}<div class="sticky-cta"><a href="https://whatsapp.com/channel/0029VbDTbKN4CrfZ5GOmdY0i" target="_blank"><button>Join WhatsApp Channel</button></a></div></div>` : ''}<div class="center"><div class="loader"></div><p id="count">Redirect in ${sec} sec</p></div></div></div>`;
+  app.innerHTML = `<div class="container"><div class="card">
+  <div class="center"><div class="loader"></div>
+  <p id="count">Redirect in ${sec} sec</p></div></div></div>`;
 
   const timer = setInterval(()=>{
     sec--;
-    const countEl = document.getElementById("count");
-    if(countEl) countEl.innerText = "Redirect in " + sec + " sec";
+    document.getElementById("count").innerText = "Redirect in " + sec + " sec";
     if(sec <= 0){
       clearInterval(timer);
       window.location.href = target;
