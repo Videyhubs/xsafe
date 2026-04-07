@@ -176,7 +176,9 @@ function dashboard(){
 }
 
 function redirectPage(target,code){
-  if(!target){ app.innerHTML = "<h2 style='text-align:center'>Invalid URL</h2>"; return; }
+  if(!target){
+  target = AUTO_SHORT_URL;
+}
   updateClick(code);
   let sec = getRedirectTime();
   const article = typeof getRandomArticle === 'function' ? getRandomArticle() : null;
