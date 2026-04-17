@@ -148,7 +148,7 @@ async function generate(){
     <div class="item">
       ${results.join("<br><br>")}
       <div style="margin-top:12px">
-        <button onclick="(${JSON.stringify(results.join('\n'))})">Copy All</button>
+        <button onclick='copyText(${JSON.stringify(results.join("\\n"))})'>Copy All</button>
       </div>
     </div>`;
   loadAnalysis();
