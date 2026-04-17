@@ -48,7 +48,7 @@ function normalize(url){ return /^https?:\/\//i.test(url) ? url : "https://" + u
 async function copyText(text){
   try {
     await navigator.clipboard.writeText(text);
-    alert("Copied");
+    showCopyToast();
   } catch (err) {
     const ta = document.createElement("textarea");
     ta.value = text.replace(/\\n/g, "\n");
@@ -56,8 +56,42 @@ async function copyText(text){
     ta.select();
     document.execCommand("copy");
     document.body.removeChild(ta);
-    alert("Copied");
+    showCopyToast();
   }
+}
+
+function showCopyToast(){
+  const el = document.createElement("div");
+  el.innerText = "Copied ✓";
+  el.style.position = "fixed";
+  el.style.bottom = "20px";
+  el.style.left = "50%";
+  el.style.transform = "translateX(-50%)";
+  el.style.background = "#22c55e";
+  el.style.color = "#fff";
+  el.style.padding = "10px 16px";
+  el.style.borderRadius = "10px";
+  el.style.fontSize = "14px";
+  el.style.boxShadow = "0 5px 15px rgba(0,0,0,0.3)";
+  el.style.zIndex = "9999";
+  el.style.opacity = "0";
+  el.style.transition = "all 0.3s ease";
+
+  document.body.appendChild(el);
+
+  setTimeout(() => {
+    el.style.opacity = "1";
+    el.style.bottom = "30px";
+  }, 10);
+
+  setTimeout(() => {
+    el.style.opacity = "0";
+    el.style.bottom = "20px";
+  }, 1500);
+
+  setTimeout(() => {
+    el.remove();
+  }, 2000);
 }
 
 function getRedirectTime(){
