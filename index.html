@@ -51,7 +51,7 @@ async function copyText(text){
     alert("Copied");
   } catch (err) {
     const ta = document.createElement("textarea");
-    ta.value = text;
+    ta.value = text.replace(/\\n/g, "\n");
     document.body.appendChild(ta);
     ta.select();
     document.execCommand("copy");
@@ -148,7 +148,7 @@ async function generate(){
     <div class="item">
       ${results.join("<br><br>")}
       <div style="margin-top:12px">
-        <button onclick='copyText(${JSON.stringify(results.join("\\n"))})'>Copy All</button>
+        <button onclick='copyText(${JSON.stringify(results.join("\n"))})'>Copy All</button>
       </div>
     </div>`;
   loadAnalysis();
@@ -177,7 +177,9 @@ function loadAnalysis(){
     Object.values(data).forEach(item=>{
       totalLinks++;
       totalClicks += item.clicks || 0;
-      historyHTML += `<div class="item"><strong>${DOMAIN}/#${item.code}</strong><p>Clicks: ${item.clicks || 0}</p><p>${item.createdAt}</p><div class="actions"><button onclick="('${DOMAIN}/#${item.code}')">Copy</button><button class="delete-btn" onclick="deleteHistory('${item.code}')">Delete</button></div></div>`;
+      historyHTML += `<div class="item"><strong>${DOMAIN}/#${item.code}</strong><p>Clicks: ${item.clicks || 0}</p><p>${item.createdAt}</p><div class="actions">
+      <button onclick="('${DOMAIN}/#${item.code}')">Copy</button><button class="delete-btn" onclick="deleteHistory('${item.code}')">Delete</button>
+      </div></div>`;
     });
     document.getElementById("analysis").innerHTML = `<div class="grid"><div class="card"><div class="stat">${totalLinks}</div><div class="small">Total Links</div></div><div class="card"><div class="stat">${totalClicks}</div><div class="small">Total Clicks</div></div></div><div class="card"><h2>History</h2><button class="delete-btn" onclick="clearAllHistory()">Clear All History</button>${historyHTML || '<p>No history yet</p>'}</div>`;
   });
