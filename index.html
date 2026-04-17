@@ -45,7 +45,7 @@ const EMOJIS = ["🔞👉","✅👉","🔴➡️","🎥▶️","🔥👉","💥�
 const EMOJIS2 = ["🔞","✅","🔴","🎥","🔥"];
   
 function getRandomEmoji(){ return EMOJIS[Math.floor(Math.random()*EMOJIS.length)]; }
-function getRandomEmoji2(){ return EMOJIS2[Math.floor(Math.random()*EMOJIS.length)]; }
+function getRandomEmoji2(){ return EMOJIS2[Math.floor(Math.random()*EMOJIS2.length)]; }
 function shuffleArray(arr){ return [...arr].sort(()=>Math.random()-0.5); }
 function normalize(url){ return /^https?:\/\//i.test(url) ? url : "https://" + url; }
 async function copyText(text){
