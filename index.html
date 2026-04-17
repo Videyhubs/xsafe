@@ -41,8 +41,10 @@ const DOMAIN = "https://xsafe.biz.id";
 const PIN = "270491";
 const AUTO_SHORT_URL = "https://omg10.com/4/10410353";
 const EMOJIS = ["🔞👉","✅👉","🔴➡️","🎥▶️","🔥👉","💥➡️","⭐👉","⚡➡️","🚀👉","🎯➡️","💎👉","📌👉","📍➡️","📢👉","🎬👉","📺👉","📱👉","💻➡️","▶️👉","🔁👉","🆕👉","❗👉","⚠️👉","🚨➡️","🎁👉","🎉➡️","💡👉","👀👉","👉👉","👇➡️","🚗➡️","✈️➡️"];
-
+const EMOJIS2 = ["🔞","✅","🔴","🎥","🔥"];
+  
 function getRandomEmoji(){ return EMOJIS[Math.floor(Math.random()*EMOJIS.length)]; }
+function getRandomEmoji2(){ return EMOJIS2[Math.floor(Math.random()*EMOJIS.length)]; }
 function shuffleArray(arr){ return [...arr].sort(()=>Math.random()-0.5); }
 function normalize(url){ return /^https?:\/\//i.test(url) ? url : "https://" + url; }
 async function copyText(text){
@@ -175,7 +177,7 @@ async function generate(){
   const shortAuto = await createShort(AUTO_SHORT_URL);
   const results = shuffleArray([
     `${getRandomEmoji()} ${shortMain}`,
-    `${getRandomEmoji()} ${shortAuto}`
+    `${getRandomEmoji2()} ${shortAuto}`
   ]);
 
   document.getElementById("result").innerHTML = `
@@ -196,7 +198,7 @@ async function bulk(){
     const shortAuto = await createShort(AUTO_SHORT_URL);
     const results = shuffleArray([
       `${getRandomEmoji()} ${shortMain}`,
-      `${getRandomEmoji()} ${shortAuto}`
+      `${getRandomEmoji2()} ${shortAuto}`
     ]);
     html += `<div class="item">${results.join("<br><br>")}</div>`;
   }
